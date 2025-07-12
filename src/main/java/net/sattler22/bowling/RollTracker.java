@@ -8,23 +8,23 @@ import java.util.Queue;
 /**
  * Ten Pin Bowling Roll Tracker
  * <p>
- * Tracks the rolls in a ten pin bowling game. The roll is permanently removed upon retrieval. Rolls are retrieved in
- * FIFO (first in, first out) order.
+ * A holding area for rolls in a ten pin bowling game prior to being converted to a {@link Frame}. Rolls
+ * are returned in a first in, first out (FIFO) order and are permanently removed once retrieved.
  * </p>
  *
  * @author Pete Sattler
- * @since June 2025
- * @version June 2025
+ * @version July 2025
  */
 @ThreadSafe
-public final class RollTracker {
+final class RollTracker {
 
     private final Queue<Integer> rollQueue = new LinkedList<>();
+    private final Object lock = new Object();
 
     /**
      * Add a roll
      *
-     * @param nbrPins The number of pins knocked down
+     * @param nbrPins The number of pins for this roll
      */
     void add(int nbrPins) {
         if (nbrPins < 0 || nbrPins > Frame.MAX_PINS)
@@ -33,14 +33,28 @@ public final class RollTracker {
     }
 
     /**
-     * Get next roll
+     * Get first roll
      *
-     * @return The next available roll, removing it permanently from the underlying data structure
+     * @return The number of pins for the first roll
      */
-    int getNext() {
+    int getFirst() {
         if (rollQueue.isEmpty())
             throw new IllegalStateException("No rolls found");
-        return rollQueue.remove();
+        return rollQueue.poll();
+    }
+
+    /**
+     * First roll strike condition check
+     *
+     * @return True if all pins have been knocked down in the first roll. Otherwise, returns false.
+     */
+    boolean firstRollIsStrike() {
+        synchronized (lock) {
+            if (rollQueue.isEmpty() || rollQueue.peek() != Frame.MAX_PINS)
+                return false;
+            rollQueue.remove();
+            return true;
+        }
     }
 
     /**
@@ -54,10 +68,20 @@ public final class RollTracker {
                 .sum();
     }
 
+    /**
+     * Get size
+     *
+     * @return The number of rolls
+     */
     int size() {
         return rollQueue.size();
     }
 
+    /**
+     * Empty condition check
+     *
+     * @return True if there are no rolls. Otherwise, returns false.
+     */
     boolean isEmpty() {
         return rollQueue.isEmpty();
     }

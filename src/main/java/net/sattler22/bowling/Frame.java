@@ -2,15 +2,14 @@ package net.sattler22.bowling;
 
 import net.jcip.annotations.ThreadSafe;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.OptionalInt;
 
 /**
- * A <code>Frame</code> represents a series of turns or opportunities for a bowler to throw the ball down the lane
- * and attempt to knock down the pins.
+ * A Ten Pin Bowling <code>Frame</code> represents a series of turns or opportunities for
+ * a bowler to throw the ball down the lane and attempt to knock down the pins.
  *
  * @author Pete Sattler
- * @since June 2025
- * @version June 2025
+ * @version July 2025
  */
 @ThreadSafe
 abstract sealed class Frame permits DefaultFrame, FinalFrame {
@@ -18,13 +17,12 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
     /**
      * Maximum pins per frame
      */
-    protected static final int MAX_PINS = 10;
+    static final int MAX_PINS = 10;
 
-    private static final AtomicInteger frameNumberGenerator = new AtomicInteger(0);
-
-    protected final int number;
     protected final int attempt1;
     protected final int attempt2;
+    protected int score = -1;
+    private final Object lock = new Object();
 
     /**
      * Constructs a new <code>Frame</code>
@@ -33,18 +31,8 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      * @param attempt2 The number of pins knocked down in the second attempt
      */
     protected Frame(int attempt1, int attempt2) {
-        this.number = frameNumberGenerator.incrementAndGet();
         this.attempt1 = attempt1;
         this.attempt2 = attempt2;
-    }
-
-    /**
-     * Get frame number
-     *
-     * @return The frame number of this game
-     */
-    int number() {
-        return number;
     }
 
     /**
@@ -68,7 +56,7 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
     /**
      * Get total
      *
-     * @return The total number of pins knocked down
+     * @return The total number of pins knocked down in this frame
      */
     int total() {
         return attempt1 + attempt2;
@@ -77,7 +65,8 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
     /**
      * Open frame condition check
      *
-     * @return True if at least one pin is left standing after all possible attempts have been made. Otherwise, returns false.
+     * @return True if at least one pin is left standing after all possible
+     *         attempts have been made. Otherwise, returns false.
      */
     boolean isOpen() {
         return total() < MAX_PINS;
@@ -86,15 +75,51 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
     /**
      * Zero frame condition check
      *
-     * @return True if no pins have been knocked down after all possible attempts have been made. Otherwise, returns false.
+     * @return True if no pins have been knocked down after all possible
+     *         attempts have been made. Otherwise, returns false.
      */
-    boolean isZero() {
+    final boolean isZero() {
         return total() == 0;
+    }
+
+    /**
+     * Score condition check
+     *
+     * @return True if this frame has already been scored. Otherwise, returns false.
+     */
+    boolean hasScore() {
+        return score > -1;
+    }
+
+    /**
+     * Settle the score :)
+     *
+     * @param bonus The number of bonus points to add to this frame's total score
+     */
+    void updateScore(int bonus) {
+        if (bonus < 0)
+            throw new IllegalArgumentException("Bonus points cannot be negative");
+        if (bonus > MAX_PINS)
+            throw new IllegalArgumentException("Bonus points cannot exceed the maximum");
+        synchronized (lock) {
+            this.score = total() + bonus;
+        }
+    }
+
+    /**
+     * Get score
+     *
+     * @return A score for this frame or an empty optional if it hasn't been scored yet.
+     */
+    OptionalInt score() {
+        if (!hasScore())
+            return OptionalInt.empty();
+        return OptionalInt.of(score);
     }
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(number);
+        return Integer.hashCode(attempt1) + Integer.hashCode(attempt2);
     }
 
     @Override
@@ -106,11 +131,12 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
         if (this.getClass() != other.getClass())
             return false;
         final Frame that = (Frame) other;
-        return this.number == that.number;
+        return this.attempt1 == that.attempt1 && this.attempt2 == that.attempt2;
     }
 
     @Override
     public String toString() {
-        return String.format("%s [number=%d, attempt1=%s, attempt2=%s]", getClass().getSimpleName(), number, attempt1, attempt2);
+        return String.format("%s [attempt1=%d, attempt2=%d, score=%s]",
+                getClass().getSimpleName(), attempt1, attempt2, hasScore() ? score : "None");
     }
 }
