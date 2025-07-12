@@ -16,70 +16,112 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 final class RollTrackerTest {
 
     @Test
-    void addRoll_withMinimumPins_thenSuccessful() {
-        assertAddGetFirstImpl(0);
+    void roll_withMinimumPins_thenSuccessful() {
+        createWithOneRollAssertImpl(0);
     }
 
     @Test
-    void addRoll_withMaxPins_thenSuccessful() {
-        assertAddGetFirstImpl(Frame.MAX_PINS);
+    void roll_withMaxPins_thenSuccessful() {
+        createWithOneRollAssertImpl(Frame.MAX_PINS);
     }
 
     @Test
-    void addRoll_withTooFewPins_thenThrowIllegalArgumentException() {
+    void roll_withTooFewPins_thenThrowIllegalArgumentException() {
         final RollTracker rollTracker = new RollTracker();
         assertThrows(IllegalArgumentException.class, () ->
                 rollTracker.add(-1));
     }
 
     @Test
-    void addRoll_withTooManyPins_thenThrowIllegalArgumentException() {
+    void roll_withTooManyPins_thenThrowIllegalArgumentException() {
         final RollTracker rollTracker = new RollTracker();
         assertThrows(IllegalArgumentException.class, () ->
                 rollTracker.add(Frame.MAX_PINS + 1));
     }
 
     @Test
-    void getFirst_WithOneRoll_thenSuccessful() {
-        assertAddGetFirstImpl(5);
+    void getNext_WithOneRoll_thenSuccessful() {
+        createWithOneRollAssertImpl(5);
     }
 
     @Test
-    void getFirst_withMultipleRolls_thenOrderIsFirstInFirstOut() {
+    void getNext_withMultipleRolls_thenOrderIsFirstInFirstOut() {
         final int nbrPins1 = 7;
         final int nbrPins2 = 2;
         final RollTracker rollTracker = createWithOneRollImpl(nbrPins1);
         rollTracker.add(nbrPins2);
-        assertEquals(nbrPins1, rollTracker.getFirst());
-        assertEquals(nbrPins2, rollTracker.getFirst());
+        assertEquals(nbrPins1, rollTracker.getNext());
+        assertEquals(nbrPins2, rollTracker.getNext());
         assertTrue(rollTracker.isEmpty());
     }
 
     @Test
-    void getFirst_withEmptyQueue_thenThrowIllegalStateException() {
+    void getNext_withEmptyQueue_thenThrowIllegalStateException() {
         final RollTracker rollTracker = new RollTracker();
-        assertThrows(IllegalStateException.class, rollTracker::getFirst);
+        assertThrows(IllegalStateException.class, rollTracker::getNext);
     }
 
     @Test
-    void firstRollIsStrike_withStrike_thenReturnTrueAndTrackerEmpty() {
+    void nextRollIsStrike_withStrike_thenReturnTrueAndTrackerHasOneRoll() {
         final RollTracker rollTracker = createWithOneRollImpl(Frame.MAX_PINS);
-        assertTrue(rollTracker.firstRollIsStrike());
-        assertTrue(rollTracker.isEmpty());
+        assertTrue(rollTracker.nextRollIsStrike());
+        assertFalse(rollTracker.isEmpty());
     }
 
     @Test
-    void firstRollIsStrike_withOneRoll_thenReturnFalseAndTrackerHasOneRoll() {
+    void nextRollIsStrike_withOneRoll_thenReturnFalseAndTrackerHasOneRoll() {
         final RollTracker rollTracker = createWithOneRollImpl(5);
-        assertFalse(rollTracker.firstRollIsStrike());
+        assertFalse(rollTracker.nextRollIsStrike());
         assertFalse(rollTracker.isEmpty());
         assertEquals(1, rollTracker.size());
     }
 
     @Test
-    void firstRollIsStrike_withNoRolls_thenReturnFalseAndTrackerEmpty() {
+    void nextRollIsStrike_withNoRolls_thenReturnFalseAndTrackerEmpty() {
         final RollTracker rollTracker = new RollTracker();
-        assertFalse(rollTracker.firstRollIsStrike());
+        assertFalse(rollTracker.nextRollIsStrike());
+        assertTrue(rollTracker.isEmpty());
+    }
+
+    @Test
+    void nextTwoRollsIsSpare_withSpare_thenReturnTrueAndTrackerHasTwoRolls() {
+        final int nbrPins = 6;
+        final RollTracker rollTracker = createWithOneRollImpl(nbrPins);
+        rollTracker.add(Frame.MAX_PINS - nbrPins);
+        assertTrue(rollTracker.nextTwoRollsIsSpare());
+        assertFalse(rollTracker.isEmpty());
+        assertEquals(2, rollTracker.size());
+    }
+
+    @Test
+    void nextTwoRollsIsSpare_withStrike_thenReturnFalseAndTrackerHasOneRoll() {
+        final RollTracker rollTracker = createWithOneRollImpl(Frame.MAX_PINS);
+        assertFalse(rollTracker.nextTwoRollsIsSpare());
+        assertFalse(rollTracker.isEmpty());
+        assertEquals(1, rollTracker.size());
+    }
+
+    @Test
+    void nextTwoRollsIsSpare_withOneNonStrikeRoll_thenReturnFalseAndTrackerHasOneRoll() {
+        final RollTracker rollTracker = createWithOneRollImpl(3);
+        assertFalse(rollTracker.nextTwoRollsIsSpare());
+        assertFalse(rollTracker.isEmpty());
+        assertEquals(1, rollTracker.size());
+    }
+
+    @Test
+    void nextTwoRollsIsSpare_withNonSpare_thenReturnFalseAndTrackerHasTwoRolls() {
+        final RollTracker rollTracker = createWithOneRollImpl(1);
+        rollTracker.add(2);
+        assertFalse(rollTracker.nextTwoRollsIsSpare());
+        assertFalse(rollTracker.isEmpty());
+        assertEquals(2, rollTracker.size());
+    }
+
+    @Test
+    void nextTwoRollsIsSpare_withNoRolls_thenReturnFalseAndTrackerEmpty() {
+        final RollTracker rollTracker = new RollTracker();
+        assertFalse(rollTracker.nextTwoRollsIsSpare());
         assertTrue(rollTracker.isEmpty());
     }
 
@@ -131,9 +173,9 @@ final class RollTrackerTest {
         assertFalse(rollTracker.isEmpty());
     }
 
-    private static void assertAddGetFirstImpl(int nbrPins) {
+    private static void createWithOneRollAssertImpl(int nbrPins) {
         final RollTracker rollTracker = createWithOneRollImpl(nbrPins);
-        assertEquals(nbrPins, rollTracker.getFirst());
+        assertEquals(nbrPins, rollTracker.getNext());
     }
 
     private static RollTracker createWithOneRollImpl(int nbrPins) {

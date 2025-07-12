@@ -27,33 +27,50 @@ final class RollTracker {
      * @param nbrPins The number of pins for this roll
      */
     void add(int nbrPins) {
-        if (nbrPins < 0 || nbrPins > Frame.MAX_PINS)
+        if (nbrPins < 0)
             throw new IllegalArgumentException("Invalid number of pins");
+        if (nbrPins > Frame.MAX_PINS)
+            throw new IllegalArgumentException("Maximum number of pins exceeded");
         rollQueue.add(nbrPins);
     }
 
     /**
-     * Get first roll
+     * Get and remove the next roll
      *
      * @return The number of pins for the first roll
      */
-    int getFirst() {
-        if (rollQueue.isEmpty())
-            throw new IllegalStateException("No rolls found");
-        return rollQueue.poll();
+    int getNext() {
+        synchronized (lock) {
+            if (rollQueue.isEmpty())
+                throw new IllegalStateException("No rolls found");
+            return rollQueue.poll();
+        }
     }
 
     /**
-     * First roll strike condition check
+     * Next roll strike condition check
      *
-     * @return True if all pins have been knocked down in the first roll. Otherwise, returns false.
+     * @return True if all pins have been knocked down in the next roll. Otherwise, returns false.
      */
-    boolean firstRollIsStrike() {
+    boolean nextRollIsStrike() {
         synchronized (lock) {
-            if (rollQueue.isEmpty() || rollQueue.peek() != Frame.MAX_PINS)
+            return !rollQueue.isEmpty() && rollQueue.peek() == Frame.MAX_PINS;
+        }
+    }
+
+    /**
+     * Next two rolls spare condition check
+     *
+     * @return True if all pins have been knocked down in the next two rolls. Otherwise, returns false.
+     */
+    boolean nextTwoRollsIsSpare() {
+        synchronized (lock) {
+            if (rollQueue.size() < 2 || rollQueue.peek() == Frame.MAX_PINS)
                 return false;
-            rollQueue.remove();
-            return true;
+            return rollQueue.stream()
+                    .limit(2)
+                    .mapToInt(Integer::intValue)
+                    .sum() == Frame.MAX_PINS;
         }
     }
 
@@ -88,6 +105,6 @@ final class RollTracker {
 
     @Override
     public String toString() {
-        return String.format("%s %s", getClass().getSimpleName(), rollQueue);
+        return String.format("%s [rollQueue=%s]", getClass().getSimpleName(), rollQueue);
     }
 }

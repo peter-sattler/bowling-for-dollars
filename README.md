@@ -1,5 +1,5 @@
 # Bowling for Dollars
-<img src="/images/bowling-for-dollars-tv-show-logo.jpg" alt="Bowling for Dollars TV Show Logo">
+[![Bowling for Dollars TV Show Logo](/images/bowling-for-dollars-tv-show-logo.jpg)]
 
 ## Background
 
@@ -29,21 +29,22 @@ each player plays ten frames in a game.
 3. Knocking down all the pins on your first throw is called a strike.
 4. If you miss at least one pin on the first throw and then knock down any remaining pins on your second throw, it's 
 called a spare.
-5. If a player bowls a strike in the tenth frame, they get two more throws within that frame. If they get a spare in 
-the final frame, the player gets to throw one more ball.
-6. Open frames are simply frames that left at least one pin standing.
-7. Scoring is based on the number of pins knocked down. Except, when you get a spare, you get 10 plus the number of 
-pins you knock down during your next throw. If you get a strike, you get 10 plus the number of pins you knock down 
-with your next two throws.
+5. Open frames are simply frames that left at least one pin standing.
+6. Scoring is based on the number of pins knocked down. Except, when you get a spare, you get 10 plus the number of 
+   pins you knock down during your next throw. If you get a strike, you get 10 plus the number of pins you knock down
+   with your next two throws.
+7. If a player bowls a strike in the tenth (final) frame, they get two more throws within that frame. If they get a
+   spare in the final frame, the player gets to throw one more ball.
 8. Honor the foul line. If a player steps over the foul line or crosses it in any way, those pins will not count 
-toward that player's score
+   toward that player's score
 
 ## Special Thanks
 
-Special Thanks to [Bowlinggenius!](https://bowlinggenius.com) for their excellent online ten pin calculator that
-I used to double check my own scoring algorithm.
+Special Thanks to [Bowling Genius!](https://bowlinggenius.com) for their excellent online ten pin calculator that
+I used to double-check my own scoring algorithm.
 
-So get out there and play a game or two with some friends or family and enjoy!!!
+So get out there and play a game or two and remember 
+to always [Take The Skinheads Bowling](https://youtu.be/DlX1cQU8rxI?si=9gq_WCLXm3B-Vwha)!!!
 
 Pete Sattler  
 July 2025  

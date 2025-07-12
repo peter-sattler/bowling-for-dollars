@@ -3,32 +3,46 @@ package net.sattler22.bowling;
 import net.jcip.annotations.Immutable;
 
 /**
- * A <code>FinalFrame</code> represents up to three consecutive rolls (attempts) in the last frame of a ten pin
- * bowling game.
+ * A Ten Pin Bowling <code>FinalFrame</code> has up to three consecutive rolls (attempts) and represents
+ * the last frame in the game. The third attempt is allowed only if all pins have been knocked down on the
+ * first two attempts.
  *
  * @author Pete Sattler
- * @since June 2025
- * @version June 2025
+ * @version July 2025
  */
 @Immutable
 final class FinalFrame extends Frame {
 
+    /**
+     * Maximum rolls per frame (including bonus roll)
+     */
+    static final int MAX_ROLLS_WITH_BONUS = MAX_ROLLS + 1;
+
     private final int attempt3;
 
-    private FinalFrame(int attempt1, int attempt2, int attempt3) {
-        super(attempt1, attempt2);
-        if (attempt1 > MAX_PINS || attempt2 > MAX_PINS || attempt3 > MAX_PINS)
+    /**
+     * Constructs a new <code>FinalFrame</code>
+     *
+     * @param nbrPins1 The number of pins knocked down in the first attempt
+     * @param nbrPins2 The number of pins knocked down in the second attempt
+     * @param nbrPins3 The number of pins knocked down in the third (bonus) attempt
+     */
+    FinalFrame(int nbrPins1, int nbrPins2, int nbrPins3) {
+        super(nbrPins1, nbrPins2);
+        if (nbrPins1 > MAX_PINS || nbrPins2 > MAX_PINS || nbrPins3 > MAX_PINS)
             throw new IllegalArgumentException("Maximum number of pins exceeded");
-        this.attempt3 = attempt3;
+        if (nbrPins1 != Frame.MAX_PINS && nbrPins1 + nbrPins2 != Frame.MAX_PINS && nbrPins3 > 0)
+            throw new IllegalArgumentException("Bonus roll has not been earned");
+        this.attempt3 = nbrPins3;
     }
 
     /**
-     * Record three strikes in a row
+     * Get third attempt
      *
-     * @return A new <code>Frame</code>
+     * @return The number of pins knocked down in the third (bonus) attempt
      */
-    static Frame allStrikes() {
-        return new FinalFrame(MAX_PINS, MAX_PINS, MAX_PINS);
+    int thirdAttempt() {
+        return attempt3;
     }
 
     /**
@@ -40,89 +54,31 @@ final class FinalFrame extends Frame {
         return attempt1 == MAX_PINS && attempt2 == MAX_PINS && attempt3 == MAX_PINS;
     }
 
-    /**
-     * Record a strike, then a spare
-     *
-     * @return A new <code>Frame</code>
-     */
-    static Frame strikeThenSpare(int nbrPins2) {
-        if (nbrPins2 == MAX_PINS)
-            throw new IllegalArgumentException("Maximum number of pins for a spare exceeded");
-        return new FinalFrame(MAX_PINS, nbrPins2, MAX_PINS - nbrPins2);
-    }
-
-    /**
-     * Record a strike, then an open frame
-     *
-     * @return A new <code>Frame</code>
-     */
-    static Frame strikeThenOpen(int nbrPins2, int nbrPins3) {
-        if (nbrPins2 + nbrPins3 == MAX_PINS)
-            throw new IllegalArgumentException("An open frame means at least one pin was left standing");
-        return new FinalFrame(MAX_PINS, nbrPins2, nbrPins3);
-    }
-
-    /**
-     * Record a spare, then a strike
-     *
-     * @return A new <code>Frame</code>
-     */
-    static Frame spareThenStrike(int nbrPins1) {
-        if (nbrPins1 == MAX_PINS)
-            throw new IllegalArgumentException("Maximum number of pins for a spare exceeded");
-        return new FinalFrame(nbrPins1, MAX_PINS - nbrPins1, MAX_PINS);
-    }
-
-    /**
-     * Record a spare, then an open frame
-     *
-     * @return A new <code>Frame</code>
-     */
-    static Frame spareThenOpen(int nbrPins1, int nbrPins3) {
-        if (nbrPins1 == MAX_PINS)
-            throw new IllegalArgumentException("Maximum number of pins for a spare exceeded");
-        if (nbrPins3 == MAX_PINS)
-            throw new IllegalArgumentException("Maximum number of pins for an open frame exceeded");
-        return new FinalFrame(nbrPins1, MAX_PINS - nbrPins1, nbrPins3);
-    }
-
-    /**
-     * Record an open frame
-     *
-     * @return A new <code>Frame</code>
-     */
-    static Frame open(int nbrPins1, int nbrPins2) {
-        if (nbrPins1 + nbrPins2 == MAX_PINS)
-            throw new IllegalArgumentException("An open frame means at least one pin was left standing");
-        return new FinalFrame(nbrPins1, nbrPins2, 0);
-    }
-
-    /**
-     * Record a zero frame
-     *
-     * @return A new <code>Frame</code>
-     */
-    static Frame zero() {
-        return new FinalFrame(0, 0, 0);
-    }
-
-    /**
-     * Get third attempt
-     *
-     * @return The number of pins knocked down in the third attempt
-     */
-    int thirdAttempt() {
-        return attempt3;
-    }
-
     @Override
     int total() {
         return super.total() + attempt3;
     }
 
     @Override
+    public int hashCode() {
+        return super.hashCode() + Integer.hashCode(attempt3);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (other == null)
+            return false;
+        if (this.getClass() != other.getClass())
+            return false;
+        final FinalFrame that = (FinalFrame) other;
+        return super.equals(other) && this.attempt3 == that.attempt3;
+    }
+
+    @Override
     public String toString() {
-        return String.format("%s [number=%d, attempt1=%s, attempt2=%s, attempt3=%s]",
-                getClass().getSimpleName(), number, attempt1, attempt2, attempt3);
+        return String.format("%s [attempt1=%s, attempt2=%s, attempt3=%s]",
+                getClass().getSimpleName(), attempt1, attempt2, attempt3);
     }
 }

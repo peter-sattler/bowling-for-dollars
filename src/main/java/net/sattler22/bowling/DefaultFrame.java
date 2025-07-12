@@ -1,16 +1,15 @@
 package net.sattler22.bowling;
 
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.Immutable;
 
 /**
  * A Ten Pin Bowling <code>DefaultFrame</code> has up to two consecutive rolls (attempts) and
- * represents most frames in a ten pin bowling game, except for the last one (which as up to
- * three consecutive rolls).
+ * represents most frames in the game, except for the last one (which as up to three consecutive rolls).
  *
  * @author Pete Sattler
  * @version July 2025
  */
-@ThreadSafe
+@Immutable
 final class DefaultFrame extends Frame {
 
     /**
@@ -35,15 +34,6 @@ final class DefaultFrame extends Frame {
     }
 
     /**
-     * Record a strike
-     *
-     * @return A new <code>DefaultFrame</code>
-     */
-    static DefaultFrame strike() {
-        return new DefaultFrame(MAX_PINS, 0);
-    }
-
-    /**
      * Spare condition check
      *
      * @return True if all pins have been knocked down on the both attempts. Otherwise, returns false.
@@ -53,33 +43,24 @@ final class DefaultFrame extends Frame {
     }
 
     /**
-     * Record a spare
+     * Record a strike
      *
      * @return A new <code>DefaultFrame</code>
      */
-    static DefaultFrame spare(int nbrPins1) {
+    static DefaultFrame strike() {
+        return new DefaultFrame(MAX_PINS, 0);
+    }
+
+    /**
+     * Record a non-strike frame
+     *
+     * @return A new <code>DefaultFrame</code>
+     */
+    static DefaultFrame nonStrike(int nbrPins1, int nbrPins2) {
         if (nbrPins1 == MAX_PINS)
-            throw new IllegalArgumentException("Maximum number of first attempt pins for a spare exceeded");
-        return new DefaultFrame(nbrPins1, MAX_PINS - nbrPins1);
-    }
-
-    /**
-     * Record an open frame
-     *
-     * @return A new <code>DefaultFrame</code>
-     */
-    static DefaultFrame open(int nbrPins1, int nbrPins2) {
-        if (nbrPins1 + nbrPins2 == MAX_PINS)
-            throw new IllegalArgumentException("Maximum number of pins for an open frame exceeded");
+            throw new IllegalArgumentException("Maximum number of pins for a non-strike exceeded");
+        if (nbrPins1 + nbrPins2 > MAX_PINS)
+            throw new IllegalArgumentException("Maximum number of pins exceeded");
         return new DefaultFrame(nbrPins1, nbrPins2);
-    }
-
-    /**
-     * Record a zero (gutter ball) frame
-     *
-     * @return A new <code>DefaultFrame</code>
-     */
-    static DefaultFrame zero() {
-        return new DefaultFrame(0, 0);
     }
 }

@@ -19,9 +19,14 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      */
     static final int MAX_PINS = 10;
 
+    /**
+     * Maximum rolls per frame
+     */
+    static final int MAX_ROLLS = 2;
+
     protected final int attempt1;
     protected final int attempt2;
-    protected int score = -1;
+    protected volatile int score = -1;
     private final Object lock = new Object();
 
     /**
@@ -31,6 +36,10 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      * @param attempt2 The number of pins knocked down in the second attempt
      */
     protected Frame(int attempt1, int attempt2) {
+        if (attempt1 < 0 || attempt2 < 0)
+            throw new IllegalArgumentException("Invalid number of pins");
+        if (attempt1 > MAX_PINS || attempt2 > MAX_PINS)
+            throw new IllegalArgumentException("Maximum number of pins exceeded");
         this.attempt1 = attempt1;
         this.attempt2 = attempt2;
     }
@@ -51,15 +60,6 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      */
     int secondAttempt() {
         return attempt2;
-    }
-
-    /**
-     * Get total
-     *
-     * @return The total number of pins knocked down in this frame
-     */
-    int total() {
-        return attempt1 + attempt2;
     }
 
     /**
@@ -115,6 +115,15 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
         if (!hasScore())
             return OptionalInt.empty();
         return OptionalInt.of(score);
+    }
+
+    /**
+     * Get total
+     *
+     * @return The total number of pins knocked down in this frame
+     */
+    int total() {
+        return attempt1 + attempt2;
     }
 
     @Override
