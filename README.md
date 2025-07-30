@@ -1,5 +1,5 @@
 # Bowling for Dollars
-[![Bowling for Dollars TV Show Logo](/images/bowling-for-dollars-tv-show-logo.jpg)]
+[![Bowling for Dollars TV Show Logo](/images/bowling-for-dollars-tv-show-logo.jpg)
 
 ## Background
 
