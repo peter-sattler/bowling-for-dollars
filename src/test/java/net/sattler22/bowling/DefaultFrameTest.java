@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Ten Pin Bowling Default Frame Test Harness
  *
  * @author Pete Sattler
- * @version July 2025
+ * @since July 2025
+ * @version August 2025
  */
 final class DefaultFrameTest {
 
@@ -87,12 +88,59 @@ final class DefaultFrameTest {
     }
 
     @Test
-    void score_withUpdate_thenReturnScore() {
+    void score_withNegativeStartingPoints_thenThrowIllegalArgumentException() {
+        final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
+        assertThrows(IllegalArgumentException.class, () ->
+                zeroFrame.updateScore(-1, 0));
+    }
+
+    @Test
+    void score_withStartingPointsTooLarge_thenThrowIllegalArgumentException() {
+        final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
+        assertThrows(IllegalArgumentException.class, () ->
+                zeroFrame.updateScore(Frame.MAX_SCORE + 1, 0));
+    }
+
+    @Test
+    void score_withNoStartingPointsNoBonusUpdate_thenReturnScore() {
+        final int nbrPins1 = 6;
+        final OptionalInt expectedScore = OptionalInt.of(Frame.MAX_PINS);
+        final DefaultFrame spareFrame = DefaultFrame.nonStrike(nbrPins1, Frame.MAX_PINS - nbrPins1);
+        spareFrame.updateScore(0, 0);
+        assertTrue(spareFrame.hasScore());
+        assertEquals(expectedScore, spareFrame.score());
+    }
+
+    @Test
+    void score_withNoStartingPointsBonusUpdate_thenReturnScore() {
         final int nbrPins1 = 6;
         final int bonusPins = 3;
         final OptionalInt expectedScore = OptionalInt.of(Frame.MAX_PINS + bonusPins);
         final DefaultFrame spareFrame = DefaultFrame.nonStrike(nbrPins1, Frame.MAX_PINS - nbrPins1);
-        spareFrame.updateScore(bonusPins);
+        spareFrame.updateScore(0, bonusPins);
+        assertTrue(spareFrame.hasScore());
+        assertEquals(expectedScore, spareFrame.score());
+    }
+
+    @Test
+    void score_withStartingPointsNoBonusUpdate_thenReturnScore() {
+        final int startingPoints = 4;
+        final int nbrPins1 = 6;
+        final OptionalInt expectedScore = OptionalInt.of(startingPoints + Frame.MAX_PINS);
+        final DefaultFrame spareFrame = DefaultFrame.nonStrike(nbrPins1, Frame.MAX_PINS - nbrPins1);
+        spareFrame.updateScore(startingPoints, 0);
+        assertTrue(spareFrame.hasScore());
+        assertEquals(expectedScore, spareFrame.score());
+    }
+
+    @Test
+    void score_withStartingPointsBonusUpdate_thenReturnScore() {
+        final int startingPoints = 5;
+        final int nbrPins1 = 6;
+        final int bonusPins = 3;
+        final OptionalInt expectedScore = OptionalInt.of(startingPoints + Frame.MAX_PINS + bonusPins);
+        final DefaultFrame spareFrame = DefaultFrame.nonStrike(nbrPins1, Frame.MAX_PINS - nbrPins1);
+        spareFrame.updateScore(startingPoints, bonusPins);
         assertTrue(spareFrame.hasScore());
         assertEquals(expectedScore, spareFrame.score());
     }
@@ -101,14 +149,14 @@ final class DefaultFrameTest {
     void score_withNegativeBonus_thenThrowIllegalArgumentException() {
         final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
         assertThrows(IllegalArgumentException.class, () ->
-                zeroFrame.updateScore(-1));
+                zeroFrame.updateScore(0,-1));
     }
 
     @Test
     void score_withBonusTooLarge_thenThrowIllegalArgumentException() {
         final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
         assertThrows(IllegalArgumentException.class, () ->
-                zeroFrame.updateScore(Frame.MAX_PINS + 1));
+                zeroFrame.updateScore(0, Frame.MAX_PINS + 1));
     }
 
     @Test

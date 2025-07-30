@@ -1,6 +1,6 @@
 package net.sattler22.bowling;
 
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A Ten Pin Bowling <code>FinalFrame</code> has up to three consecutive rolls (attempts) and represents
@@ -10,7 +10,7 @@ import net.jcip.annotations.Immutable;
  * @author Pete Sattler
  * @version July 2025
  */
-@Immutable
+@ThreadSafe
 final class FinalFrame extends Frame {
 
     /**
@@ -37,21 +37,21 @@ final class FinalFrame extends Frame {
     }
 
     /**
-     * Get third attempt
-     *
-     * @return The number of pins knocked down in the third (bonus) attempt
-     */
-    int thirdAttempt() {
-        return attempt3;
-    }
-
-    /**
      * Turkey condition check
      *
      * @return True if all pins have been knocked down in all three frames. Otherwise, returns false.
      */
     boolean isTurkey() {
         return attempt1 == MAX_PINS && attempt2 == MAX_PINS && attempt3 == MAX_PINS;
+    }
+
+    /**
+     * Get third attempt
+     *
+     * @return The number of pins knocked down in the third (bonus) attempt
+     */
+    int thirdAttempt() {
+        return attempt3;
     }
 
     @Override

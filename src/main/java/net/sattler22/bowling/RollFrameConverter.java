@@ -1,17 +1,20 @@
 package net.sattler22.bowling;
 
+import net.jcip.annotations.ThreadSafe;
+
 import java.util.Optional;
 
 /**
  * Ten Pin Bowling Roll to Frame Converter
  * <p>
- * Record each roll and convert them to frames. No scoring is performed. Assumes that zero
+ * Record each roll and convert them to frames. No scoring is performed. Assumes that all zero
  * pin rolls have been captured.
  * </p>
  *
  * @author Pete Sattler
- * @version July 2025
+ * @version August 2025
  */
+@ThreadSafe
 final class RollFrameConverter {
 
     private final RollTracker rollTracker = new RollTracker();
@@ -30,50 +33,36 @@ final class RollFrameConverter {
     }
 
     /**
-     * Convert individual rolls into a default frame
+     * Convert individual rolls into a frame
      *
-     * @return An optional {@link DefaultFrame}
+     * @param isFinal False for a {@link DefaultFrame} or true for a {@link FinalFrame}
+     * @return An optional {@link Frame}
      */
-    Optional<DefaultFrame> convertToDefaultFrame() {
-        if (rollTracker.nextRollIsStrike()) {
-            rollTracker.getNext();
-            return Optional.of(DefaultFrame.strike());
-        }
-        if (rollTracker.size() == Frame.MAX_ROLLS)
-            return Optional.of(DefaultFrame.nonStrike(rollTracker.getNext(), rollTracker.getNext()));
-        return Optional.empty();
+    Optional<Frame> convert(boolean isFinal) {
+        return Optional.ofNullable(!isFinal ? convertToDefaultFrameImpl() : convertToFinalFrameImpl());
     }
 
-    /**
-     * Convert individual rolls into a final frame
-     * <p>
-     * A bonus roll is earned in the final frame:
-     * <ol>
-     * <li>If a player bowls a strike, then they get two more throws.</li>
-     * <li>If a player bowls a spare, then they get one more throw.</li>
-     * </ol>
-     * </p>
-     * @return An optional {@link FinalFrame}
-     */
-    Optional<FinalFrame> convertToFinalFrame() {
+    private DefaultFrame convertToDefaultFrameImpl() {
+        if (rollTracker.nextRollIsStrike()) {
+            rollTracker.getNext();
+            return DefaultFrame.strike();
+        }
+        if (rollTracker.size() == Frame.MAX_ROLLS)
+            return DefaultFrame.nonStrike(rollTracker.getNext(), rollTracker.getNext());
+        return null;
+    }
+
+    private FinalFrame convertToFinalFrameImpl() {
         if (!hasEarnedBonusRoll() && rollTracker.size() == Frame.MAX_ROLLS)
-            return Optional.of(new FinalFrame(rollTracker.getNext(), rollTracker.getNext(), 0));
+            return new FinalFrame(rollTracker.getNext(), rollTracker.getNext(), 0);
+        //Bonus for first STRIKE or first SPARE:
         if (hasEarnedBonusRoll() && rollTracker.size() == FinalFrame.MAX_ROLLS_WITH_BONUS)
-            return Optional.of(new FinalFrame(rollTracker.getNext(), rollTracker.getNext(), rollTracker.getNext()));
-        return Optional.empty();
+            return new FinalFrame(rollTracker.getNext(), rollTracker.getNext(), rollTracker.getNext());
+        return null;
     }
 
     private boolean hasEarnedBonusRoll() {
         return rollTracker.nextRollIsStrike() || rollTracker.nextTwoRollsIsSpare();
-    }
-
-    /**
-     * Get total
-     *
-     * @return The total number of pins for all rolls
-     */
-    int total() {
-        return rollTracker.total();
     }
 
     /**
@@ -83,6 +72,15 @@ final class RollFrameConverter {
      */
     int size() {
         return rollTracker.size();
+    }
+
+    /**
+     * Get total
+     *
+     * @return The total number of pins for all rolls
+     */
+    int total() {
+        return rollTracker.total();
     }
 
     @Override

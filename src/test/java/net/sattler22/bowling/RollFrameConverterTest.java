@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Ten Pin Bowling Roll to Frame Converter Test Harness
  *
  * @author Pete Sattler
- * @version July 2025
+ * @version August 2025
  */
 final class RollFrameConverterTest {
 
@@ -50,7 +50,7 @@ final class RollFrameConverterTest {
     @Test
     void convertDefaultFrame_withNoRolls_thenReturnEmpty() {
         final RollFrameConverter rollFrameConverter = new RollFrameConverter();
-        final Optional<DefaultFrame> emptyFrame = rollFrameConverter.convertToDefaultFrame();
+        final Optional<Frame> emptyFrame = rollFrameConverter.convert(false);
         assertTrue(emptyFrame.isEmpty());
         assertEquals(0, rollFrameConverter.total());
         assertEquals(0, rollFrameConverter.size());
@@ -60,7 +60,7 @@ final class RollFrameConverterTest {
     void convertDefaultFrame_withOneNonStrike_thenReturnEmpty() {
         final int nbrPins1 = Frame.MAX_PINS - 1;
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(nbrPins1);
-        final Optional<DefaultFrame> emptyFrame = rollFrameConverter.convertToDefaultFrame();
+        final Optional<Frame> emptyFrame = rollFrameConverter.convert(false);
         assertTrue(emptyFrame.isEmpty());
         assertEquals(nbrPins1, rollFrameConverter.total());
         assertEquals(1, rollFrameConverter.size());
@@ -69,7 +69,9 @@ final class RollFrameConverterTest {
     @Test
     void convertDefaultFrame_withStrike_thenReturnStrikeFrame() {
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(Frame.MAX_PINS);
-        final DefaultFrame strikeFrame = rollFrameConverter.convertToDefaultFrame().orElse(null);
+        final DefaultFrame strikeFrame =
+                (DefaultFrame) rollFrameConverter.convert(false)
+                        .orElse(null);
         assertNotNull(strikeFrame);
         assertTrue(strikeFrame.isStrike());
         assertEquals(0, rollFrameConverter.total());
@@ -80,7 +82,9 @@ final class RollFrameConverterTest {
     void convertDefaultFrame_withTwoNonStrikes_thenReturnNonStrikeFrame() {
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(3);
         rollFrameConverter.roll(1);
-        final DefaultFrame nonStrikeFrame = rollFrameConverter.convertToDefaultFrame().orElse(null);
+        final DefaultFrame nonStrikeFrame =
+                (DefaultFrame) rollFrameConverter.convert(false)
+                        .orElse(null);
         assertNotNull(nonStrikeFrame);
         assertFalse(nonStrikeFrame.isStrike());
         assertEquals(0, rollFrameConverter.total());
@@ -90,7 +94,7 @@ final class RollFrameConverterTest {
     @Test
     void convertToFinalFrame_withNoRolls_thenReturnEmpty() {
         final RollFrameConverter rollFrameConverter = new RollFrameConverter();
-        final Optional<FinalFrame> emptyFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> emptyFrame = rollFrameConverter.convert(true);
         assertTrue(emptyFrame.isEmpty());
         assertEquals(0, rollFrameConverter.total());
         assertEquals(0, rollFrameConverter.size());
@@ -99,7 +103,7 @@ final class RollFrameConverterTest {
     @Test
     void convertFinalFrame_withFirstStrike_thenReturnEmpty() {
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(Frame.MAX_PINS);
-        final Optional<FinalFrame> emptyFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> emptyFrame = rollFrameConverter.convert(true);
         assertTrue(emptyFrame.isEmpty());
         assertEquals(Frame.MAX_PINS, rollFrameConverter.total());
         assertEquals(1, rollFrameConverter.size());
@@ -109,7 +113,7 @@ final class RollFrameConverterTest {
     void convertFinalFrame_withTwoStrikes_thenReturnEmpty() {
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(Frame.MAX_PINS);
         rollFrameConverter.roll(Frame.MAX_PINS);
-        final Optional<FinalFrame> emptyFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> emptyFrame = rollFrameConverter.convert(true);
         assertTrue(emptyFrame.isEmpty());
         assertEquals(Frame.MAX_PINS * 2, rollFrameConverter.total());
         assertEquals(2, rollFrameConverter.size());
@@ -120,8 +124,11 @@ final class RollFrameConverterTest {
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(Frame.MAX_PINS);
         rollFrameConverter.roll(Frame.MAX_PINS);
         rollFrameConverter.roll(Frame.MAX_PINS);
-        final Optional<FinalFrame> finalFrame = rollFrameConverter.convertToFinalFrame();
-        assertFalse(finalFrame.isEmpty());
+        final FinalFrame finalFrame =
+                (FinalFrame) rollFrameConverter.convert(true)
+                        .orElse(null);
+        assertNotNull(finalFrame);
+        assertTrue(finalFrame.isTurkey());
         assertEquals(0, rollFrameConverter.total());
         assertEquals(0, rollFrameConverter.size());
     }
@@ -131,7 +138,7 @@ final class RollFrameConverterTest {
         final int nbrPins2 = 3;
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(Frame.MAX_PINS);
         rollFrameConverter.roll(nbrPins2);
-        final Optional<FinalFrame> emptyFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> emptyFrame = rollFrameConverter.convert(true);
         assertTrue(emptyFrame.isEmpty());
         assertEquals(Frame.MAX_PINS + nbrPins2, rollFrameConverter.total());
         assertEquals(2, rollFrameConverter.size());
@@ -142,7 +149,7 @@ final class RollFrameConverterTest {
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(Frame.MAX_PINS);
         rollFrameConverter.roll(3);
         rollFrameConverter.roll(1);
-        final Optional<FinalFrame> finalFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> finalFrame = rollFrameConverter.convert(true);
         assertFalse(finalFrame.isEmpty());
         assertEquals(0, rollFrameConverter.total());
         assertEquals(0, rollFrameConverter.size());
@@ -152,7 +159,7 @@ final class RollFrameConverterTest {
     void convertFinalFrame_withFirstNonStrike_thenReturnEmpty() {
         final int nbrPins1 = 8;
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(nbrPins1);
-        final Optional<FinalFrame> emptyFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> emptyFrame = rollFrameConverter.convert(true);
         assertTrue(emptyFrame.isEmpty());
         assertEquals(nbrPins1, rollFrameConverter.total());
         assertEquals(1, rollFrameConverter.size());
@@ -164,7 +171,7 @@ final class RollFrameConverterTest {
         final int nbrPins2 = 2;
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(nbrPins1);
         rollFrameConverter.roll(nbrPins2);
-        final Optional<FinalFrame> finalFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> finalFrame = rollFrameConverter.convert(true);
         assertFalse(finalFrame.isEmpty());
         assertEquals(0, rollFrameConverter.total());
         assertEquals(0, rollFrameConverter.size());
@@ -176,7 +183,7 @@ final class RollFrameConverterTest {
         final int nbrPins2 = 3;
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(nbrPins1);
         rollFrameConverter.roll(nbrPins2);
-        final Optional<FinalFrame> emptyFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> emptyFrame = rollFrameConverter.convert(true);
         assertTrue(emptyFrame.isEmpty());
         assertEquals(nbrPins1 + nbrPins2, rollFrameConverter.total());
         assertEquals(2, rollFrameConverter.size());
@@ -190,7 +197,7 @@ final class RollFrameConverterTest {
         final RollFrameConverter rollFrameConverter = createWithOneRollImpl(nbrPins1);
         rollFrameConverter.roll(nbrPins2);
         rollFrameConverter.roll(nbrPins3);
-        final Optional<FinalFrame> finalFrame = rollFrameConverter.convertToFinalFrame();
+        final Optional<Frame> finalFrame = rollFrameConverter.convert(true);
         assertFalse(finalFrame.isEmpty());
         assertEquals(0, rollFrameConverter.total());
         assertEquals(0, rollFrameConverter.size());

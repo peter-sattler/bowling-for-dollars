@@ -1,6 +1,6 @@
 package net.sattler22.bowling;
 
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A Ten Pin Bowling <code>DefaultFrame</code> has up to two consecutive rolls (attempts) and
@@ -9,7 +9,7 @@ import net.jcip.annotations.Immutable;
  * @author Pete Sattler
  * @version July 2025
  */
-@Immutable
+@ThreadSafe
 final class DefaultFrame extends Frame {
 
     /**
@@ -22,24 +22,6 @@ final class DefaultFrame extends Frame {
         super(attempt1, attempt2);
         if (attempt1 + attempt2 > MAX_PINS)
             throw new IllegalArgumentException("Maximum number of pins exceeded");
-    }
-
-    /**
-     * Strike condition check
-     *
-     * @return True if all pins have been knocked down on the first attempt. Otherwise, returns false.
-     */
-    boolean isStrike() {
-        return attempt1 == MAX_PINS;
-    }
-
-    /**
-     * Spare condition check
-     *
-     * @return True if all pins have been knocked down on the both attempts. Otherwise, returns false.
-     */
-    boolean isSpare() {
-        return !isStrike() && total() == MAX_PINS;
     }
 
     /**
@@ -62,5 +44,23 @@ final class DefaultFrame extends Frame {
         if (nbrPins1 + nbrPins2 > MAX_PINS)
             throw new IllegalArgumentException("Maximum number of pins exceeded");
         return new DefaultFrame(nbrPins1, nbrPins2);
+    }
+
+    /**
+     * Strike condition check
+     *
+     * @return True if all pins have been knocked down on the first attempt. Otherwise, returns false.
+     */
+    boolean isStrike() {
+        return attempt1 == MAX_PINS;
+    }
+
+    /**
+     * Spare condition check
+     *
+     * @return True if all pins have been knocked down on the both attempts. Otherwise, returns false.
+     */
+    boolean isSpare() {
+        return !isStrike() && total() == MAX_PINS;
     }
 }

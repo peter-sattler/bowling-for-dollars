@@ -9,11 +9,11 @@ import java.util.Queue;
  * Ten Pin Bowling Roll Tracker
  * <p>
  * A holding area for rolls in a ten pin bowling game prior to being converted to a {@link Frame}. Rolls
- * are returned in a first in, first out (FIFO) order and are permanently removed once retrieved.
+ * are returned in a first in, first out (FIFO) order and are permanently removed once they are retrieved.
  * </p>
  *
  * @author Pete Sattler
- * @version July 2025
+ * @version August 2025
  */
 @ThreadSafe
 final class RollTracker {
@@ -75,14 +75,12 @@ final class RollTracker {
     }
 
     /**
-     * Get total
+     * Empty condition check
      *
-     * @return The total number of pins for all rolls
+     * @return True if there are no rolls. Otherwise, returns false.
      */
-    int total() {
-        return rollQueue.stream()
-                .mapToInt(Integer::intValue)
-                .sum();
+    boolean isEmpty() {
+        return rollQueue.isEmpty();
     }
 
     /**
@@ -95,12 +93,14 @@ final class RollTracker {
     }
 
     /**
-     * Empty condition check
+     * Get total
      *
-     * @return True if there are no rolls. Otherwise, returns false.
+     * @return The total number of pins for all rolls
      */
-    boolean isEmpty() {
-        return rollQueue.isEmpty();
+    int total() {
+        return rollQueue.stream()
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
     @Override

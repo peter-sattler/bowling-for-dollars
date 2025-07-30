@@ -38,6 +38,17 @@ called a spare.
 8. Honor the foul line. If a player steps over the foul line or crosses it in any way, those pins will not count 
    toward that player's score
 
+### Symbols
+
+The following symbols are typically used on a score card: 
+
+| Symbol | Meaning              |
+|:------:|----------------------|
+|   X    | Strike               |
+|   /    | Spare (slash)        |
+|   -    | Zero pin roll (dash) |
+|   F    | Foul by bowler       |
+
 ## Special Thanks
 
 Special Thanks to [Bowling Genius!](https://bowlinggenius.com) for their excellent online ten pin calculator that
@@ -47,5 +58,5 @@ So get out there and play a game or two and remember
 to always [Take The Skinheads Bowling](https://youtu.be/DlX1cQU8rxI?si=9gq_WCLXm3B-Vwha)!!!
 
 Pete Sattler  
-July 2025  
+Summer 2025  
 _peter@sattler22.net_  

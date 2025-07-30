@@ -9,7 +9,8 @@ import java.util.OptionalInt;
  * a bowler to throw the ball down the lane and attempt to knock down the pins.
  *
  * @author Pete Sattler
- * @version July 2025
+ * @since July 2025
+ * @version August 2025
  */
 @ThreadSafe
 abstract sealed class Frame permits DefaultFrame, FinalFrame {
@@ -23,6 +24,11 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      * Maximum rolls per frame
      */
     static final int MAX_ROLLS = 2;
+
+    /**
+     * Maximum score per game
+     */
+    static final int MAX_SCORE = 300;
 
     protected final int attempt1;
     protected final int attempt2;
@@ -42,24 +48,6 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
             throw new IllegalArgumentException("Maximum number of pins exceeded");
         this.attempt1 = attempt1;
         this.attempt2 = attempt2;
-    }
-
-    /**
-     * Get first attempt
-     *
-     * @return The number of pins knocked down in the first attempt
-     */
-    int firstAttempt() {
-        return attempt1;
-    }
-
-    /**
-     * Get second attempt
-     *
-     * @return The number of pins knocked down in the second attempt
-     */
-    int secondAttempt() {
-        return attempt2;
     }
 
     /**
@@ -92,21 +80,6 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
     }
 
     /**
-     * Settle the score :)
-     *
-     * @param bonus The number of bonus points to add to this frame's total score
-     */
-    void updateScore(int bonus) {
-        if (bonus < 0)
-            throw new IllegalArgumentException("Bonus points cannot be negative");
-        if (bonus > MAX_PINS)
-            throw new IllegalArgumentException("Bonus points cannot exceed the maximum");
-        synchronized (lock) {
-            this.score = total() + bonus;
-        }
-    }
-
-    /**
      * Get score
      *
      * @return A score for this frame or an empty optional if it hasn't been scored yet.
@@ -115,6 +88,44 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
         if (!hasScore())
             return OptionalInt.empty();
         return OptionalInt.of(score);
+    }
+
+    /**
+     * Settle the score :)
+     *
+     * @param start The starting number of points
+     * @param bonus The number of bonus points to add to this frame's total score
+     */
+    void updateScore(int start, int bonus) {
+        if (start < 0)
+            throw new IllegalArgumentException("Starting points cannot be negative");
+        if (start > MAX_SCORE)
+            throw new IllegalArgumentException("Starting points cannot exceed the maximum");
+        if (bonus < 0)
+            throw new IllegalArgumentException("Bonus points cannot be negative");
+        if (bonus > MAX_PINS)
+            throw new IllegalArgumentException("Bonus points cannot exceed the maximum");
+        synchronized (lock) {
+            this.score = start + total() + bonus;
+        }
+    }
+
+    /**
+     * Get first attempt
+     *
+     * @return The number of pins knocked down in the first attempt
+     */
+    int firstAttempt() {
+        return attempt1;
+    }
+
+    /**
+     * Get second attempt
+     *
+     * @return The number of pins knocked down in the second attempt
+     */
+    int secondAttempt() {
+        return attempt2;
     }
 
     /**
