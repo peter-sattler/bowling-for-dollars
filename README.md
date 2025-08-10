@@ -40,7 +40,7 @@ called a spare.
 
 ### Symbols
 
-The following symbols are typically used on a score card: 
+The following symbols are typically used on a ten pin bowling score card: 
 
 | Symbol | Meaning              |
 |:------:|----------------------|

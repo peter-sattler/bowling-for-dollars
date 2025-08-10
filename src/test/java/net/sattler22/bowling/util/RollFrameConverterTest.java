@@ -1,5 +1,8 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.util;
 
+import net.sattler22.bowling.model.DefaultFrame;
+import net.sattler22.bowling.model.FinalFrame;
+import net.sattler22.bowling.model.Frame;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

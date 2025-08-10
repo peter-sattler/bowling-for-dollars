@@ -1,6 +1,9 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.util;
 
 import net.jcip.annotations.ThreadSafe;
+import net.sattler22.bowling.model.DefaultFrame;
+import net.sattler22.bowling.model.FinalFrame;
+import net.sattler22.bowling.model.Frame;
 
 import java.util.Optional;
 
@@ -15,7 +18,7 @@ import java.util.Optional;
  * @version August 2025
  */
 @ThreadSafe
-final class RollFrameConverter {
+public final class RollFrameConverter {
 
     private final RollTracker rollTracker = new RollTracker();
 
@@ -24,7 +27,7 @@ final class RollFrameConverter {
      *
      * @param nbrPins The number of pins for this roll
      */
-    void roll(int nbrPins) {
+    public void roll(int nbrPins) {
         if (nbrPins < 0)
             throw new IllegalArgumentException("Invalid number of pins");
         if (nbrPins > Frame.MAX_PINS)
@@ -38,7 +41,7 @@ final class RollFrameConverter {
      * @param isFinal False for a {@link DefaultFrame} or true for a {@link FinalFrame}
      * @return An optional {@link Frame}
      */
-    Optional<Frame> convert(boolean isFinal) {
+    public Optional<Frame> convert(boolean isFinal) {
         return Optional.ofNullable(!isFinal ? convertToDefaultFrameImpl() : convertToFinalFrameImpl());
     }
 
@@ -70,7 +73,7 @@ final class RollFrameConverter {
      *
      * @return The number of rolls
      */
-    int size() {
+    public int size() {
         return rollTracker.size();
     }
 
@@ -79,7 +82,7 @@ final class RollFrameConverter {
      *
      * @return The total number of pins for all rolls
      */
-    int total() {
+    public int total() {
         return rollTracker.total();
     }
 

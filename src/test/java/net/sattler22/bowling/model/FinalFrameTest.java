@@ -1,4 +1,4 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Ten Pin Bowling Final Frame Test Harness
  *
  * @author Pete Sattler
- * @version July 2025
+ * @since July 2025
+ * @version August 2025
  */
 final class FinalFrameTest {
 
@@ -29,7 +30,7 @@ final class FinalFrameTest {
     }
 
     @Test
-    void newInstance_withTooManyPins3_thenThrowIllegalArgumentException() {
+    void newInstance_withTooManyBonusPins_thenThrowIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () ->
                 new FinalFrame(0, 0, Frame.MAX_PINS + 1));
     }
@@ -50,53 +51,70 @@ final class FinalFrameTest {
     void newInstance_withFirstStrikeBonusEarned_thenSuccessful() {
         final int nbrPins1 = Frame.MAX_PINS;
         final int nbrPins2 = 2;
-        final int nbrPins3 = 3;
-        final FinalFrame finalFrame = new FinalFrame(nbrPins1, nbrPins2, nbrPins3);
+        final int bonusNbrPins = 6;
+        final FinalFrame finalFrame = new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
         assertEquals(nbrPins1, finalFrame.firstAttempt());
         assertEquals(nbrPins2, finalFrame.secondAttempt());
-        assertEquals(nbrPins3, finalFrame.thirdAttempt());
+        assertEquals(bonusNbrPins, finalFrame.bonusAttempt());
         assertFalse(finalFrame.isTurkey());
-        assertEquals(nbrPins1 + nbrPins2 + nbrPins3, finalFrame.total());
+        assertEquals(nbrPins1 + nbrPins2 + bonusNbrPins, finalFrame.total());
     }
 
     @Test
     void newInstance_withSpareBonusEarned_thenSuccessful() {
         final int nbrPins1 = Frame.MAX_PINS - 2;
         final int nbrPins2 = 2;
-        final int nbrPins3 = 5;
-        final FinalFrame finalFrame = new FinalFrame(nbrPins1, nbrPins2, nbrPins3);
+        final int bonusNbrPins = 5;
+        final FinalFrame finalFrame = new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
         assertEquals(nbrPins1, finalFrame.firstAttempt());
         assertEquals(nbrPins2, finalFrame.secondAttempt());
-        assertEquals(nbrPins3, finalFrame.thirdAttempt());
+        assertEquals(bonusNbrPins, finalFrame.bonusAttempt());
         assertFalse(finalFrame.isTurkey());
-        assertEquals(nbrPins1 + nbrPins2 + nbrPins3, finalFrame.total());
+        assertEquals(nbrPins1 + nbrPins2 + bonusNbrPins, finalFrame.total());
     }
 
     @Test
     void isTurkey_withFirstStrike_thenReturnFalse() {
-        final FinalFrame finalFrame = new FinalFrame(Frame.MAX_PINS, 2, 0);
-        assertFalse(finalFrame.isTurkey());
+        assertFalse(new FinalFrame(Frame.MAX_PINS, 2, 0).isTurkey());
     }
 
     @Test
     void isTurkey_withTwoStrikes_thenReturnFalse() {
-        final FinalFrame finalFrame = new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, 3);
-        assertFalse(finalFrame.isTurkey());
+        assertFalse(new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, 2).isTurkey());
     }
 
     @Test
     void isTurkey_withThreeStrikes_thenReturnTrue() {
-        final FinalFrame finalFrame = new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS);
-        assertTrue(finalFrame.isTurkey());
+        assertTrue(new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS).isTurkey());
+    }
+
+    @Test
+    void isSpare_withFirstStrike_thenReturnFalse() {
+        assertFalse(new FinalFrame(Frame.MAX_PINS, 2, 4).isSpare());
+    }
+
+    @Test
+    void isSpare_withOpenFrameNoBonus_thenReturnFalse() {
+        assertFalse(new FinalFrame(1, 2, 0).isSpare());
+    }
+
+    @Test
+    void isSpare_withSpareNoBonus_thenReturnTrue() {
+        assertTrue(new FinalFrame(9, 1, 0).isSpare());
+    }
+
+    @Test
+    void isSpare_withSpareAndBonus_thenReturnTrue() {
+        assertTrue(new FinalFrame(9, 1, Frame.MAX_PINS).isSpare());
     }
 
     @Test
     void compare_equalFrames_thenReturnTrue() {
         final int nbrPins1 = 1;
         final int nbrPins2 = 9;
-        final int nbrPins3 = 3;
-        final FinalFrame finalFrame1 = new FinalFrame(nbrPins1, nbrPins2, nbrPins3);
-        final FinalFrame finalFrame2 = new FinalFrame(nbrPins1, nbrPins2, nbrPins3);
+        final int bonusNbrPins = 5;
+        final FinalFrame finalFrame1 = new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
+        final FinalFrame finalFrame2 = new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
         assertEquals(finalFrame1, finalFrame2);
     }
 

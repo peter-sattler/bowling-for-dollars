@@ -1,6 +1,7 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.util;
 
 import net.jcip.annotations.ThreadSafe;
+import net.sattler22.bowling.model.Frame;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -16,7 +17,7 @@ import java.util.Queue;
  * @version August 2025
  */
 @ThreadSafe
-final class RollTracker {
+public final class RollTracker {
 
     private final Queue<Integer> rollQueue = new LinkedList<>();
     private final Object lock = new Object();
@@ -26,7 +27,7 @@ final class RollTracker {
      *
      * @param nbrPins The number of pins for this roll
      */
-    void add(int nbrPins) {
+    public void add(int nbrPins) {
         if (nbrPins < 0)
             throw new IllegalArgumentException("Invalid number of pins");
         if (nbrPins > Frame.MAX_PINS)
@@ -39,7 +40,7 @@ final class RollTracker {
      *
      * @return The number of pins for the first roll
      */
-    int getNext() {
+    public int getNext() {
         synchronized (lock) {
             if (rollQueue.isEmpty())
                 throw new IllegalStateException("No rolls found");
@@ -52,7 +53,7 @@ final class RollTracker {
      *
      * @return True if all pins have been knocked down in the next roll. Otherwise, returns false.
      */
-    boolean nextRollIsStrike() {
+    public boolean nextRollIsStrike() {
         synchronized (lock) {
             return !rollQueue.isEmpty() && rollQueue.peek() == Frame.MAX_PINS;
         }
@@ -63,7 +64,7 @@ final class RollTracker {
      *
      * @return True if all pins have been knocked down in the next two rolls. Otherwise, returns false.
      */
-    boolean nextTwoRollsIsSpare() {
+    public boolean nextTwoRollsIsSpare() {
         synchronized (lock) {
             if (rollQueue.size() < 2 || rollQueue.peek() == Frame.MAX_PINS)
                 return false;
@@ -79,7 +80,7 @@ final class RollTracker {
      *
      * @return True if there are no rolls. Otherwise, returns false.
      */
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return rollQueue.isEmpty();
     }
 
@@ -88,7 +89,7 @@ final class RollTracker {
      *
      * @return The number of rolls
      */
-    int size() {
+    public int size() {
         return rollQueue.size();
     }
 
@@ -97,7 +98,7 @@ final class RollTracker {
      *
      * @return The total number of pins for all rolls
      */
-    int total() {
+    public int total() {
         return rollQueue.stream()
                 .mapToInt(Integer::intValue)
                 .sum();

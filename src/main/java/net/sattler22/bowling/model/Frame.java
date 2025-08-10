@@ -1,4 +1,4 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.model;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -13,22 +13,22 @@ import java.util.OptionalInt;
  * @version August 2025
  */
 @ThreadSafe
-abstract sealed class Frame permits DefaultFrame, FinalFrame {
+public abstract sealed class Frame permits DefaultFrame, FinalFrame {
 
     /**
      * Maximum pins per frame
      */
-    static final int MAX_PINS = 10;
+    public static final int MAX_PINS = 10;
 
     /**
      * Maximum rolls per frame
      */
-    static final int MAX_ROLLS = 2;
+    public static final int MAX_ROLLS = 2;
 
     /**
-     * Maximum score per game
+     * Maximum bonus pins per frame
      */
-    static final int MAX_SCORE = 300;
+    static final int MAX_BONUS_PINS = MAX_PINS * 2;
 
     protected final int attempt1;
     protected final int attempt2;
@@ -56,7 +56,7 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      * @return True if at least one pin is left standing after all possible
      *         attempts have been made. Otherwise, returns false.
      */
-    boolean isOpen() {
+    public final boolean isOpen() {
         return total() < MAX_PINS;
     }
 
@@ -66,7 +66,7 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      * @return True if no pins have been knocked down after all possible
      *         attempts have been made. Otherwise, returns false.
      */
-    final boolean isZero() {
+    public final boolean isZero() {
         return total() == 0;
     }
 
@@ -75,7 +75,7 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      *
      * @return True if this frame has already been scored. Otherwise, returns false.
      */
-    boolean hasScore() {
+    public final boolean hasScore() {
         return score > -1;
     }
 
@@ -84,7 +84,7 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      *
      * @return A score for this frame or an empty optional if it hasn't been scored yet.
      */
-    OptionalInt score() {
+    public final OptionalInt score() {
         if (!hasScore())
             return OptionalInt.empty();
         return OptionalInt.of(score);
@@ -96,15 +96,13 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      * @param start The starting number of points
      * @param bonus The number of bonus points to add to this frame's total score
      */
-    void updateScore(int start, int bonus) {
+    public final void updateScore(int start, int bonus) {
         if (start < 0)
             throw new IllegalArgumentException("Starting points cannot be negative");
-        if (start > MAX_SCORE)
-            throw new IllegalArgumentException("Starting points cannot exceed the maximum");
         if (bonus < 0)
             throw new IllegalArgumentException("Bonus points cannot be negative");
-        if (bonus > MAX_PINS)
-            throw new IllegalArgumentException("Bonus points cannot exceed the maximum");
+        if (bonus > MAX_BONUS_PINS)
+            throw new IllegalArgumentException("Bonus points cannot exceed the maximum allowed");
         synchronized (lock) {
             this.score = start + total() + bonus;
         }
@@ -115,7 +113,7 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      *
      * @return The number of pins knocked down in the first attempt
      */
-    int firstAttempt() {
+    public final int firstAttempt() {
         return attempt1;
     }
 
@@ -124,7 +122,7 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      *
      * @return The number of pins knocked down in the second attempt
      */
-    int secondAttempt() {
+    public final int secondAttempt() {
         return attempt2;
     }
 
@@ -133,7 +131,7 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
      *
      * @return The total number of pins knocked down in this frame
      */
-    int total() {
+    public int total() {
         return attempt1 + attempt2;
     }
 

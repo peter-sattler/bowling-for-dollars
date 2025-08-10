@@ -1,4 +1,4 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.util;
 
 /**
  * Ten Pin Bowling Frame List Test Harness

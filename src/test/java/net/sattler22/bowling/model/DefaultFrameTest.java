@@ -1,7 +1,8 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.OptionalInt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -81,6 +82,61 @@ final class DefaultFrameTest {
     }
 
     @Test
+    void rollTotal_withNullFrames_thenThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                DefaultFrame.rollTotal(null, 0));
+    }
+
+    @Test
+    void rollTotal_withNegativeRolls_thenThrowIllegalArgumentException() {
+        final List<DefaultFrame> frames = List.of(DefaultFrame.strike());
+        assertThrows(IllegalArgumentException.class, () ->
+                DefaultFrame.rollTotal(frames, -1));
+    }
+
+    @Test
+    void rollTotal_withZeroRolls_thenReturnZeroTotal() {
+        assertEquals(0, DefaultFrame.rollTotal(List.of(DefaultFrame.strike()), 0));
+    }
+
+    @Test
+    void rollTotal_withFirstStrikeAndOpenFrame_thenReturnTwoRollTotal() {
+        final int roll2 = 7;
+        final int nbrRolls = 2;
+        final List<DefaultFrame> frames = List.of(DefaultFrame.strike(), DefaultFrame.nonStrike(roll2, 1));
+        assertEquals(Frame.MAX_PINS + roll2, DefaultFrame.rollTotal(frames, nbrRolls));
+    }
+
+    @Test
+    void rollTotal_withFirstSpare_thenReturnTwoRollTotal() {
+        final int roll1 = 3;
+        final int roll2 = 7;
+        final int nbrRolls = 2;
+        final List<DefaultFrame> frames = List.of(DefaultFrame.nonStrike(roll1, roll2));
+        assertEquals(roll1 + roll2, DefaultFrame.rollTotal(frames, nbrRolls));
+    }
+
+    @Test
+    void rollTotal_withOpenFrameAndSpare_thenReturnTwoRollTotal() {
+        final int roll1 = 3;
+        final int roll2 = 0;
+        final int roll3 = 6;
+        final int roll4 = Frame.MAX_PINS - roll3;
+        final int nbrRolls = 2;
+        final List<DefaultFrame> frames = List.of(DefaultFrame.nonStrike(roll1, roll2), DefaultFrame.nonStrike(roll3, roll4));
+        assertEquals(roll1 + roll2, DefaultFrame.rollTotal(frames, nbrRolls));
+    }
+
+    @Test
+    void rollTotal_withOpenFrameAndStrike_thenReturnTwoRollTotal() {
+        final int roll1 = 0;
+        final int roll2 = 0;
+        final int nbrRolls = 2;
+        final List<DefaultFrame> frames = List.of(DefaultFrame.nonStrike(roll1, roll2), DefaultFrame.strike());
+        assertEquals(roll1 + roll2, DefaultFrame.rollTotal(frames, nbrRolls));
+    }
+
+    @Test
     void score_withoutUpdate_thenReturnEmpty() {
         final DefaultFrame strikeFrame = DefaultFrame.strike();
         assertFalse(strikeFrame.hasScore());
@@ -92,13 +148,6 @@ final class DefaultFrameTest {
         final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
         assertThrows(IllegalArgumentException.class, () ->
                 zeroFrame.updateScore(-1, 0));
-    }
-
-    @Test
-    void score_withStartingPointsTooLarge_thenThrowIllegalArgumentException() {
-        final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
-        assertThrows(IllegalArgumentException.class, () ->
-                zeroFrame.updateScore(Frame.MAX_SCORE + 1, 0));
     }
 
     @Test
@@ -156,7 +205,7 @@ final class DefaultFrameTest {
     void score_withBonusTooLarge_thenThrowIllegalArgumentException() {
         final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
         assertThrows(IllegalArgumentException.class, () ->
-                zeroFrame.updateScore(0, Frame.MAX_PINS + 1));
+                zeroFrame.updateScore(0, Frame.MAX_BONUS_PINS + 1));
     }
 
     @Test

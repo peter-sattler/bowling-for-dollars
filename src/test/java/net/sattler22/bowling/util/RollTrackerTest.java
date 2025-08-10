@@ -1,5 +1,6 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.util;
 
+import net.sattler22.bowling.model.Frame;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,29 +1,47 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.util;
 
-import java.util.LinkedList;
+import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.ThreadSafe;
+import net.sattler22.bowling.model.Frame;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 /**
- * Ten Pin Bowling Peekable {@link Frame} List
+ * Ten Pin Bowling peek-ahead {@link Frame} List
  *
  * @author Pete Sattler
  * @version August 2025
  */
-final class FrameList {
+@ThreadSafe
+public final class FrameList {
 
-    static final int MAX_FRAMES = 10;
-    private final List<Frame> frames = new LinkedList<>();
+    /**
+     * Maximum frames allowed
+     */
+    public static final int MAX_FRAMES = 10;
+
+    private final List<Frame> frames = Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Add a new frame
      *
      * @param frame The new frame to add
      */
-    void add(Frame frame) {
+    public void add(Frame frame) {
         frames.add(frame);
+    }
+
+    /**
+     * Get all frames
+     *
+     * @return A copy of all frames in the list
+     */
+    public List<Frame> frames() {
+        return List.copyOf(frames);
     }
 
     /**
@@ -31,7 +49,7 @@ final class FrameList {
      *
      * @return The number of frames
      */
-    int size() {
+    public int size() {
         return frames.size();
     }
 
@@ -40,7 +58,7 @@ final class FrameList {
      *
      * @return True if the next frame add will be the last one permitted. Otherwise, returns false.
      */
-    boolean isFinalFrame() {
+    public boolean isFinalFrame() {
         return frames.size() == MAX_FRAMES - 1;
     }
 
@@ -49,10 +67,15 @@ final class FrameList {
      *
      * @return True if no more frames are allowed. Otherwise, returns false.
      */
-    boolean isFull() {
+    public boolean isFull() {
         return frames.size() == MAX_FRAMES;
     }
 
+    /**
+     * Get frame stream
+     *
+     * @return A sequential {@code Stream} of all frames
+     */
     public Stream<Frame> stream() {
         return frames.stream();
     }
@@ -60,21 +83,25 @@ final class FrameList {
     /**
      * Get frame iterator
      *
-     * @return A peekable, frame iterator
+     * @return A peek-ahead, frame iterator
      */
     public FrameIterator iterator() {
         return new FrameIterator(frames.listIterator());
     }
 
     /**
-     * Peekable frame iterator
+     * Peek-ahead frame iterator
+     * <p>
+     * This iterator is not thread-safe and will fail fast throwing a {@link java.util.ConcurrentModificationException}
+     * </p>
      */
-    static final class FrameIterator implements ListIterator<Frame> {
+    @NotThreadSafe
+    public static final class FrameIterator implements ListIterator<Frame> {
 
         private final ListIterator<Frame> source;
 
         /**
-         * Constructs a new, peekable frame iterator
+         * Constructs a new, peek-ahead frame iterator
          *
          * @param source The source iterator
          */
@@ -103,16 +130,21 @@ final class FrameList {
         }
 
         /**
-         * Returns the next element in the list, but maintains the cursor
+         * Returns all next elements in the list, but maintains the cursor
          * position. This method should not be used to iterate through the list.
          *
-         * @return The next element in the list
-         * @throws NoSuchElementException When the iteration has no next element
+         * @return All ot the next elements in the list (or an empty list when no elements are found)
          */
-        public Frame peekNext() {
-            final Frame next = source.next();
-            source.previous();  //Restore position
-            return next;
+        public List<Frame> peekNextAll() {
+            final List<Frame> nextList = new ArrayList<>();
+            int count = 0;
+            while (source.hasNext()) {
+                nextList.add(source.next());
+                count++;
+            }
+            for(int i = 0; i < count; i++)
+                source.previous();  //Restore position
+            return nextList;
         }
 
         @Override
