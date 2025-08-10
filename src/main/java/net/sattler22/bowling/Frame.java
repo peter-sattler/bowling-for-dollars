@@ -26,9 +26,9 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
     static final int MAX_ROLLS = 2;
 
     /**
-     * Maximum score per game
+     * Maximum bonus pins per frame
      */
-    static final int MAX_SCORE = 300;
+    static final int MAX_BONUS_PINS = MAX_PINS * 2;
 
     protected final int attempt1;
     protected final int attempt2;
@@ -99,12 +99,10 @@ abstract sealed class Frame permits DefaultFrame, FinalFrame {
     void updateScore(int start, int bonus) {
         if (start < 0)
             throw new IllegalArgumentException("Starting points cannot be negative");
-        if (start > MAX_SCORE)
-            throw new IllegalArgumentException("Starting points cannot exceed the maximum");
         if (bonus < 0)
             throw new IllegalArgumentException("Bonus points cannot be negative");
-        if (bonus > MAX_PINS)
-            throw new IllegalArgumentException("Bonus points cannot exceed the maximum");
+        if (bonus > MAX_BONUS_PINS)
+            throw new IllegalArgumentException("Bonus points cannot exceed the maximum allowed");
         synchronized (lock) {
             this.score = start + total() + bonus;
         }

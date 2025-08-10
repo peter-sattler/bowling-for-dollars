@@ -95,13 +95,6 @@ final class DefaultFrameTest {
     }
 
     @Test
-    void score_withStartingPointsTooLarge_thenThrowIllegalArgumentException() {
-        final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
-        assertThrows(IllegalArgumentException.class, () ->
-                zeroFrame.updateScore(Frame.MAX_SCORE + 1, 0));
-    }
-
-    @Test
     void score_withNoStartingPointsNoBonusUpdate_thenReturnScore() {
         final int nbrPins1 = 6;
         final OptionalInt expectedScore = OptionalInt.of(Frame.MAX_PINS);
@@ -156,7 +149,7 @@ final class DefaultFrameTest {
     void score_withBonusTooLarge_thenThrowIllegalArgumentException() {
         final DefaultFrame zeroFrame = DefaultFrame.nonStrike(0, 0);
         assertThrows(IllegalArgumentException.class, () ->
-                zeroFrame.updateScore(0, Frame.MAX_PINS + 1));
+                zeroFrame.updateScore(0, Frame.MAX_BONUS_PINS + 1));
     }
 
     @Test

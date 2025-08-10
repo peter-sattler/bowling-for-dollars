@@ -1,9 +1,9 @@
 package net.sattler22.bowling;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 /**
@@ -24,6 +24,15 @@ final class FrameList {
      */
     void add(Frame frame) {
         frames.add(frame);
+    }
+
+    /**
+     * Get all frames
+     *
+     * @return A copy of all frames in the list
+     */
+    List<Frame> frames() {
+        return List.copyOf(frames);
     }
 
     /**
@@ -53,6 +62,11 @@ final class FrameList {
         return frames.size() == MAX_FRAMES;
     }
 
+    /**
+     * Get frame stream
+     *
+     * @return A sequential {@code Stream} of all frames
+     */
     public Stream<Frame> stream() {
         return frames.stream();
     }
@@ -103,16 +117,21 @@ final class FrameList {
         }
 
         /**
-         * Returns the next element in the list, but maintains the cursor
+         * Returns all next elements in the list, but maintains the cursor
          * position. This method should not be used to iterate through the list.
          *
-         * @return The next element in the list
-         * @throws NoSuchElementException When the iteration has no next element
+         * @return All ot the next elements in the list (or an empty list when no elements are found)
          */
-        public Frame peekNext() {
-            final Frame next = source.next();
-            source.previous();  //Restore position
-            return next;
+        public List<Frame> peekNextAll() {
+            final List<Frame> nextList = new ArrayList<>();
+            int count = 0;
+            while (source.hasNext()) {
+                nextList.add(source.next());
+                count++;
+            }
+            for(int i = 0; i < count; i++)
+                source.previous();  //Restore position
+            return nextList;
         }
 
         @Override

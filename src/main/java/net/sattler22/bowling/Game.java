@@ -40,6 +40,11 @@ import static net.sattler22.bowling.FrameList.FrameIterator;
  */
 final class Game {
 
+    /**
+     * Maximum score per game
+     */
+    static final int MAX_SCORE = 300;
+
     private static final Logger logger = LoggerFactory.getLogger(Game.class);
     private final String playerName;
     private final RollFrameConverter rollFrameConverter = new RollFrameConverter();
@@ -66,6 +71,13 @@ final class Game {
     }
 
     /**
+     * Record a strike
+     */
+    void strike() {
+        roll(Frame.MAX_PINS);
+    }
+
+    /**
      * Game over condition check
      *
      * @return True if the game is over (all frames recorded). Otherwise, returns false.
@@ -75,10 +87,12 @@ final class Game {
     }
 
     /**
-     * Record a strike
+     * Perfect game condition check
+     *
+     * @return True if all pins in the game were knocked over. Otherwise, returns false.
      */
-    void strike() {
-        roll(Frame.MAX_PINS);
+    boolean isPerfect() {
+        return score() == MAX_SCORE;
     }
 
     /**
@@ -100,8 +114,11 @@ final class Game {
         if (frame != null) {
             frameList.add(frame);
             for(final Frame updatedFrame : updateScore())
-                logger.info("{}'s rolls converted to {}", playerName, updatedFrame);
+                logger.info("Added frame for {}: {}", playerName, updatedFrame);
+            logger.info("{}'s score after {} frame{}: {}", playerName, size(), size() == 1 ? "" : "s", score());
         }
+        if (isPerfect())
+            logger.info("Congratulations {}, you have bowled a PERFECT game!!!", playerName);
     }
 
     private List<Frame> updateScore() {
@@ -126,22 +143,28 @@ final class Game {
         };
     }
 
-    //Scoring is based on the number of pins knocked down, except:
-    // -When you get a SPARE, you get 10 plus the number of pins you knock down during your next throw.
-    // -When you get a STRIKE, you get 10 plus the number of pins you knock down with your next two throws.
     private static OptionalInt calculateBonus(DefaultFrame currentFrame, FrameIterator frameIterator) {
         if (currentFrame.isOpen())
             return OptionalInt.of(0);
         if (frameIterator.hasNext()) {
-            final DefaultFrame peekNextFrame = (DefaultFrame) frameIterator.peekNext();
+            final List<Frame> peekNextFrames = frameIterator.peekNextAll();  //No cast needed
             if (currentFrame.isSpare())
-                return OptionalInt.of(peekNextFrame.attempt1);
-            if (currentFrame.isStrike())
-                return OptionalInt.of(peekNextFrame.total());
+                return OptionalInt.of(peekNextFrames.getFirst().attempt1);
+            if (currentFrame.isStrike() && peekNextFrames.size() == 1)
+                return OptionalInt.of(peekNextFrames.getFirst().total());
+            if (currentFrame.isStrike() && peekNextFrames.size() == 2) {
+                return OptionalInt.of(peekNextFrames.stream()
+                        .map(Frame::total)
+                        .mapToInt(Integer::intValue)
+                        .sum());
+            }
         }
         return OptionalInt.empty();
     }
 
+    //Scoring is based on the number of pins knocked down, except:
+    // -When you get a SPARE, you get 10 plus the number of pins you knock down during your next throw.
+    // -When you get a STRIKE, you get 10 plus the number of pins you knock down with your next two throws.
     private static OptionalInt calculateBonus(FinalFrame currentFrame, FrameIterator frameIterator) {
         return OptionalInt.of(0);
     }
@@ -156,6 +179,15 @@ final class Game {
                 .flatMapToInt(OptionalInt::stream)
                 .reduce((first, second) -> second)
                 .orElse(0);
+    }
+
+    /**
+     * Get all frames
+     *
+     * @return A list of all frames in the game
+     */
+    List<Frame> frames() {
+        return frameList.frames();
     }
 
     /**
