@@ -2,15 +2,13 @@ package net.sattler22.bowling.model;
 
 import net.jcip.annotations.ThreadSafe;
 
-import java.util.OptionalInt;
-
 /**
- * A Ten Pin Bowling <code>Frame</code> represents a series of turns or opportunities for
- * a bowler to throw the ball down the lane and attempt to knock down the pins.
+ * A Ten Pin Bowling <code>Frame</code> represents a series of opportunities for a bowler to throw the ball down the
+ * lane and knock down the pins.
  *
  * @author Pete Sattler
  * @since July 2025
- * @version August 2025
+ * @version October 2025
  */
 @ThreadSafe
 public abstract sealed class Frame permits DefaultFrame, FinalFrame {
@@ -20,54 +18,57 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
      */
     public static final int MAX_PINS = 10;
 
-    /**
-     * Maximum rolls per frame
-     */
-    public static final int MAX_ROLLS = 2;
-
-    /**
-     * Maximum bonus pins per frame
-     */
-    static final int MAX_BONUS_PINS = MAX_PINS * 2;
-
-    protected final int attempt1;
-    protected final int attempt2;
-    protected volatile int score = -1;
+    private final int firstRoll;
+    private final int secondRoll;
+    private final boolean zero;
+    private final boolean open;
+    private final boolean spare;
+    private volatile int score = -1;
     private final Object lock = new Object();
 
     /**
      * Constructs a new <code>Frame</code>
      *
-     * @param attempt1 The number of pins knocked down in the first attempt
-     * @param attempt2 The number of pins knocked down in the second attempt
+     * @param nbrPins1 The number of pins knocked down in the first roll
+     * @param nbrPins2 The number of pins knocked down in the second roll
      */
-    protected Frame(int attempt1, int attempt2) {
-        if (attempt1 < 0 || attempt2 < 0)
+    protected Frame(int nbrPins1, int nbrPins2) {
+        if (nbrPins1 < 0 || nbrPins2 < 0)
             throw new IllegalArgumentException("Invalid number of pins");
-        if (attempt1 > MAX_PINS || attempt2 > MAX_PINS)
+        if (nbrPins1 > MAX_PINS || nbrPins2 > MAX_PINS)
             throw new IllegalArgumentException("Maximum number of pins exceeded");
-        this.attempt1 = attempt1;
-        this.attempt2 = attempt2;
-    }
-
-    /**
-     * Open frame condition check
-     *
-     * @return True if at least one pin is left standing after all possible
-     *         attempts have been made. Otherwise, returns false.
-     */
-    public final boolean isOpen() {
-        return total() < MAX_PINS;
+        this.firstRoll = nbrPins1;
+        this.secondRoll = nbrPins2;
+        this.zero = nbrPins1 + nbrPins2 == 0;
+        this.open = nbrPins1 + nbrPins2 < MAX_PINS;  //Zero frame is also an open one
+        this.spare = nbrPins1 != MAX_PINS && nbrPins1 + nbrPins2 == MAX_PINS;
     }
 
     /**
      * Zero frame condition check
      *
-     * @return True if no pins have been knocked down after all possible
-     *         attempts have been made. Otherwise, returns false.
+     * @return True if no pins have been knocked down after all possible attempts have been made. Otherwise, returns false.
      */
     public final boolean isZero() {
-        return total() == 0;
+        return zero;
+    }
+
+    /**
+     * Open frame condition check
+     *
+     * @return True if at least one pin is left standing after all possible attempts have been made. Otherwise, returns false.
+     */
+    public final boolean isOpen() {
+        return open;
+    }
+
+    /**
+     * Spare condition check
+     *
+     * @return True if all pins have been knocked down on the first two attempts. Otherwise, returns false.
+     */
+    public final boolean isSpare() {
+        return spare;
     }
 
     /**
@@ -82,48 +83,44 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     /**
      * Get score
      *
-     * @return A score for this frame or an empty optional if it hasn't been scored yet.
+     * @return The score for this frame or -1 if it hasn't been scored yet.
      */
-    public final OptionalInt score() {
-        if (!hasScore())
-            return OptionalInt.empty();
-        return OptionalInt.of(score);
+    public final int score() {
+        return score;
     }
 
     /**
      * Settle the score :)
      *
      * @param start The starting number of points
-     * @param bonus The number of bonus points to add to this frame's total score
+     * @param bonus The number of bonus points
      */
     public final void updateScore(int start, int bonus) {
         if (start < 0)
             throw new IllegalArgumentException("Starting points cannot be negative");
         if (bonus < 0)
             throw new IllegalArgumentException("Bonus points cannot be negative");
-        if (bonus > MAX_BONUS_PINS)
-            throw new IllegalArgumentException("Bonus points cannot exceed the maximum allowed");
         synchronized (lock) {
             this.score = start + total() + bonus;
         }
     }
 
     /**
-     * Get first attempt
+     * Get first roll
      *
-     * @return The number of pins knocked down in the first attempt
+     * @return The number of pins knocked down in the first roll
      */
-    public final int firstAttempt() {
-        return attempt1;
+    public final int firstRoll() {
+        return firstRoll;
     }
 
     /**
-     * Get second attempt
+     * Get second roll
      *
-     * @return The number of pins knocked down in the second attempt
+     * @return The number of pins knocked down in the second roll
      */
-    public final int secondAttempt() {
-        return attempt2;
+    public final int secondRoll() {
+        return secondRoll;
     }
 
     /**
@@ -132,12 +129,12 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
      * @return The total number of pins knocked down in this frame
      */
     public int total() {
-        return attempt1 + attempt2;
+        return firstRoll + secondRoll;
     }
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(attempt1) + Integer.hashCode(attempt2);
+        return Integer.hashCode(firstRoll) + Integer.hashCode(secondRoll);
     }
 
     @Override
@@ -149,12 +146,12 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
         if (this.getClass() != other.getClass())
             return false;
         final Frame that = (Frame) other;
-        return this.attempt1 == that.attempt1 && this.attempt2 == that.attempt2;
+        return this.firstRoll == that.firstRoll && this.secondRoll == that.secondRoll;
     }
 
     @Override
     public String toString() {
-        return String.format("%s [attempt1=%d, attempt2=%d, score=%s]",
-                getClass().getSimpleName(), attempt1, attempt2, hasScore() ? score : "None");
+        return String.format("%s [firstRoll=%d, secondRoll=%d, zero=%b, open=%b, spare=%b, score=%s]",
+                getClass().getSimpleName(), firstRoll, secondRoll, zero, open, spare, score);
     }
 }

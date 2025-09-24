@@ -1,0 +1,145 @@
+package net.sattler22.bowling.model;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Ten Pin Bowling Game
+ *
+ * <p>
+ * Tracks and scores all frames for a ten pin bowling player.
+ * </p>
+ * <p>
+ * Rules:
+ * <ol>
+ * <li>The ultimate goal is to knock down all ten pins on your first turn.</li>
+ * <li>During each frame, each player gets two attempts to knock down all ten pins. Turns are called frames,
+ * and each player plays ten frames in a game.</li>
+ * <li>Knocking down all the pins on your first throw is called a strike.</li>
+ * <li>If you miss at least one pin on the first throw and then knock down any remaining pins on your second
+ * throw, it's called a spare.</li>
+ * <li>Open frames are simply frames that left at least one pin standing.</li>
+ * <li>Scoring is based on the number of pins knocked down. Except, when you get a spare, you get 10 plus the
+ * number of pins you knock down during your next throw. If you get a strike, you get 10 plus the number of pins
+ * you knock down with your next two throws.</li>
+ * If a player bowls a strike in the tenth (final) frame, they get two more throws within that frame. If they get a
+ * spare in the final frame, the player gets to throw one more ball.</li>
+ * <li>Honor the foul line. If a player steps over the foul line or crosses it in any way, those pins will not count
+ * toward that player's score</li>
+ * </ol>
+ * </p>
+ *
+ * @author Pete Sattler
+ * @version October 2025
+ */
+public final class Game {
+
+    /**
+     * Maximum frames allowed
+     */
+    public static final int MAX_FRAMES = 10;
+
+    private final String playerName;
+    private final List<Frame> frames = Collections.synchronizedList(new ArrayList<>());
+
+    /**
+     * Constructs a new <code>Game</code>
+     *
+     * @param playerName The player's name
+     */
+    public Game(String playerName) {
+        if (playerName == null || playerName.isBlank())
+            throw new IllegalArgumentException("Player name is required");
+        this.playerName = playerName;
+    }
+
+    /**
+     * Get player name
+     *
+     * @return The player associated with this game
+     */
+    public String playerName() {
+        return playerName;
+    }
+
+    /**
+     * Game over condition check
+     *
+     * @return True if the game is over (all frames recorded). Otherwise, returns false.
+     */
+    public boolean isOver() {
+        return frames.size() == MAX_FRAMES;
+    }
+
+    /**
+     * Perfect game condition check
+     *
+     * @return True if all pins in the game were knocked over. Otherwise, returns false.
+     */
+    public boolean isPerfect() {
+        return score() == 300;
+    }
+
+    /**
+     * Add a frame
+     *
+     * @param frame The new {@link Frame}
+     */
+    public void addFrame(Frame frame) {
+        if (isOver())
+            throw new IllegalStateException("%s's game is over".formatted(playerName));
+        if (frame == null)
+            throw new IllegalArgumentException("Frame is required");
+        if (frames.size() == MAX_FRAMES - 1 && !(frame instanceof FinalFrame))
+            throw new IllegalArgumentException("The final frame must include a bonus attempt");
+        frames.add(frame);
+    }
+
+    public List<Frame> calculateScore() {
+        final List<Frame> updatedFrames = new ArrayList<>();
+        for (int index = 0; index < frames.size(); index++) {
+            final Frame currentFrame = frames.get(index);
+            if (!currentFrame.hasScore()) {
+                final int start = index == 0 ? 0 : frames.get(index - 1).score();
+                if (currentFrame.isOpen())
+                    currentFrame.updateScore(start, 0);
+                else if (currentFrame instanceof DefaultFrame defaultFrame) {
+                    //SPARE bonus is next roll:
+                    if (defaultFrame.isSpare() && index < frames.size() - 1)
+                        currentFrame.updateScore(start, frames.get(index + 1).firstRoll());
+                    //STRIKE bonus is next two rolls:
+                    if (index < frames.size() - 2)
+                        currentFrame.updateScore(start, frames.get(index + 1).total());
+                }
+                else if (currentFrame instanceof FinalFrame finalFrame) {
+                    //SPARE bonus is next roll:
+                    if (finalFrame.isSpare())
+                        finalFrame.updateScore(start, finalFrame.bonusRoll());
+                    //STRIKE bonus is next two rolls:
+                    if (finalFrame.firstRoll() == Frame.MAX_PINS)
+                        finalFrame.updateScore(start, finalFrame.secondRoll() + finalFrame.bonusRoll());
+                }
+                if (currentFrame.hasScore())
+                    updatedFrames.add(currentFrame);
+            }
+        }
+        return updatedFrames;
+    }
+
+    /**
+     * Score a single player's game
+     */
+    public int score() {
+        return frames.reversed().stream()
+                .filter(Frame::hasScore)
+                .mapToInt(Frame::score)
+                .findFirst()
+                .orElse(0);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s [playerName=%s, frames=%s]", getClass().getSimpleName(), playerName, frames);
+    }
+}

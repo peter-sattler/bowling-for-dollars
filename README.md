@@ -4,22 +4,15 @@
 ## Background
 
 During an onsite job interview in 2023, I was asked to solve a coding challenge that I had 
-[seen before](http://github.com/peter-sattler/ancient-text-translator/blob/main/README.md). So after being way
-too honest with hiring manager (lets call him "David"), he went off in search of an alternative. He came back 
-with this; a [Ten Pin Bowling](https://en.m.wikipedia.org/wiki/Tenpin_bowling) scoring calculator. Suddenly, I 
+[seen before](http://github.com/peter-sattler/ancient-text-translator/blob/main/README.md). So after being way too honest with hiring manager (lets call him "David"), he went off in search of
+an alternative. He came back with this; a [Ten Pin Bowling](https://en.m.wikipedia.org/wiki/Tenpin_bowling) scoring calculator. Suddenly, I 
 wished I had paid more attention to my oldest sister who took me to the local bowling alley growing up and 
 encouraged me to learn how the scoring worked.
 
 ## TV Show
 
-This project is dedicated to the [Bowling for Dollars](https://en.m.wikipedia.org/wiki/Bowling_for_Dollars) TV 
-show that I used to watch with my grandfather. A decidedly low budget game show that I have fond memories of. Their 
-logo is proudly displayed above.
-
-## Overall Design
-
-The system supports a single game for one player. It first captures the number of pins knocked down, then converts 
-them into a frame once enough attempts have accumulated. After that, the frame is scored accordingly.
+This project is dedicated to the [Bowling for Dollars](https://en.m.wikipedia.org/wiki/Bowling_for_Dollars) TV show that I used to watch with my grandfather. A decidedly 
+low budget game show that I have fond memories of. Their logo is proudly displayed above.
 
 ### Scoring Rules
 
@@ -38,25 +31,31 @@ called a spare.
 8. Honor the foul line. If a player steps over the foul line or crosses it in any way, those pins will not count 
    toward that player's score
 
-### Symbols
+## Getting Started
 
-The following symbols are typically used on a ten pin bowling score card: 
+These instructions will get you a copy of this project up and running on your local machine. Please make sure 
+your __JAVA_HOME__ environment variable is set to a valid JDK installation (JRE will not work).
 
-| Symbol | Meaning              |
-|:------:|----------------------|
-|   X    | Strike               |
-|   /    | Spare (slash)        |
-|   -    | Zero pin roll (dash) |
-|   F    | Foul by bowler       |
+1. Clone this Git repository:
+```text
+git clone https://github.com/peter-sattler/bowling-for-dollars
+```
+2. Switch to the application directory:
+```text
+cd bowling-for-dollars
+```
+3. Run the program:
+```text
+./mvnw compile exec:java
+```
 
 ## Special Thanks
 
-Special Thanks to [Bowling Genius!](https://bowlinggenius.com) for their excellent online ten pin calculator that
-I used to double-check my own scoring algorithm.
+Special Thanks to [Bowling Genius!](https://bowlinggenius.com) for their excellent online ten pin calculator that I used to double-check my 
+own scoring algorithm.
 
-So get out there and play a game or two and remember 
-to always [Take The Skinheads Bowling](https://youtu.be/DlX1cQU8rxI?si=9gq_WCLXm3B-Vwha)!!!
+So get out there and play a game or two and remember to always [Take The Skinheads Bowling](https://youtu.be/DlX1cQU8rxI?si=9gq_WCLXm3B-Vwha)!!!
 
 Pete Sattler  
-Summer 2025  
+September 2025  
 _peter@sattler22.net_  

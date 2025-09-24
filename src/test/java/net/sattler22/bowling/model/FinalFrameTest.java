@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Pete Sattler
  * @since July 2025
- * @version August 2025
+ * @version October 2025
  */
 final class FinalFrameTest {
 
@@ -53,9 +53,9 @@ final class FinalFrameTest {
         final int nbrPins2 = 2;
         final int bonusNbrPins = 6;
         final FinalFrame finalFrame = new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
-        assertEquals(nbrPins1, finalFrame.firstAttempt());
-        assertEquals(nbrPins2, finalFrame.secondAttempt());
-        assertEquals(bonusNbrPins, finalFrame.bonusAttempt());
+        assertEquals(nbrPins1, finalFrame.firstRoll());
+        assertEquals(nbrPins2, finalFrame.secondRoll());
+        assertEquals(bonusNbrPins, finalFrame.bonusRoll());
         assertFalse(finalFrame.isTurkey());
         assertEquals(nbrPins1 + nbrPins2 + bonusNbrPins, finalFrame.total());
     }
@@ -66,9 +66,9 @@ final class FinalFrameTest {
         final int nbrPins2 = 2;
         final int bonusNbrPins = 5;
         final FinalFrame finalFrame = new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
-        assertEquals(nbrPins1, finalFrame.firstAttempt());
-        assertEquals(nbrPins2, finalFrame.secondAttempt());
-        assertEquals(bonusNbrPins, finalFrame.bonusAttempt());
+        assertEquals(nbrPins1, finalFrame.firstRoll());
+        assertEquals(nbrPins2, finalFrame.secondRoll());
+        assertEquals(bonusNbrPins, finalFrame.bonusRoll());
         assertFalse(finalFrame.isTurkey());
         assertEquals(nbrPins1 + nbrPins2 + bonusNbrPins, finalFrame.total());
     }
