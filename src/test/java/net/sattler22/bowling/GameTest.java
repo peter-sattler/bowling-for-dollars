@@ -1,4 +1,4 @@
-package net.sattler22.bowling.model;
+package net.sattler22.bowling;
 
 import org.junit.jupiter.api.Test;
 

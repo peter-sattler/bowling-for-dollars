@@ -1,4 +1,4 @@
-package net.sattler22.bowling.model;
+package net.sattler22.bowling;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -23,6 +23,7 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     private final boolean zero;
     private final boolean open;
     private final boolean spare;
+    private final boolean strike;
     private volatile int score = -1;
     private final Object lock = new Object();
 
@@ -41,7 +42,8 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
         this.secondRoll = nbrPins2;
         this.zero = nbrPins1 + nbrPins2 == 0;
         this.open = nbrPins1 + nbrPins2 < MAX_PINS;  //Zero frame is also an open one
-        this.spare = nbrPins1 != MAX_PINS && nbrPins1 + nbrPins2 == MAX_PINS;
+        this.strike = nbrPins1 == MAX_PINS;
+        this.spare = !this.strike && nbrPins1 + nbrPins2 == MAX_PINS;
     }
 
     /**
@@ -69,6 +71,15 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
      */
     public final boolean isSpare() {
         return spare;
+    }
+
+    /**
+     * Strike condition check
+     *
+     * @return True if all pins have been knocked down on the first attempt. Otherwise, returns false.
+     */
+    public boolean isStrike() {
+        return strike;
     }
 
     /**
@@ -151,7 +162,7 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
 
     @Override
     public String toString() {
-        return String.format("%s [firstRoll=%d, secondRoll=%d, zero=%b, open=%b, spare=%b, score=%s]",
-                getClass().getSimpleName(), firstRoll, secondRoll, zero, open, spare, score);
+        return String.format("%s [firstRoll=%d, secondRoll=%d, zero=%b, open=%b, spare=%b, strike=%b, score=%s]",
+                getClass().getSimpleName(), firstRoll, secondRoll, zero, open, spare, strike, score);
     }
 }

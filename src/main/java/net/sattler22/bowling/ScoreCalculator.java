@@ -1,9 +1,5 @@
 package net.sattler22.bowling;
 
-import net.sattler22.bowling.model.DefaultFrame;
-import net.sattler22.bowling.model.FinalFrame;
-import net.sattler22.bowling.model.Frame;
-import net.sattler22.bowling.model.Game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,27 +29,12 @@ public final class ScoreCalculator {
             else {
                 final Game game = new Game(playerName);
                 for (int index = 0; index < Game.MAX_FRAMES - 1; index++) {
-                    final DefaultFrame defaultFrame;
-                    final int nbrPins1 = captureRoll(scanner, "FIRST", index + 1);
-                    if (nbrPins1 == Frame.MAX_PINS)
-                        defaultFrame = DefaultFrame.strike();
-                    else {
-                        final int nbrPins2 = captureRoll(scanner, "SECOND", index + 1);
-                        defaultFrame = new DefaultFrame(nbrPins1, nbrPins2);
-                    }
-                    game.addFrame(defaultFrame);
-                    for(final Frame updatedFrame : game.calculateScore())
+                    game.addFrame(captureDefaultFrame(scanner, index + 1));
+                    for(final Frame updatedFrame : game.updateScore())
                         logger.info("Added frame for {}: {}", playerName, updatedFrame);
                 }
-                final int nbrPins1 = captureRoll(scanner, "FIRST", Frame.MAX_PINS);
-                final int nbrPins2 = captureRoll(scanner, "SECOND", Frame.MAX_PINS);
-                final int bonusNbrPins;
-                if (FinalFrame.hasEarnedBonusRoll(nbrPins1, nbrPins2))
-                    bonusNbrPins = captureRoll(scanner, "BONUS", Frame.MAX_PINS);
-                else
-                    bonusNbrPins = 0;
-                game.addFrame(new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins));
-                game.calculateScore();
+                game.addFrame(captureFinalFrame(scanner));
+                game.updateScore();
                 if (game.isOver()) {
                     logger.info("{}'s total score: {}", playerName, game.score());
                     if (game.isPerfect())
@@ -67,6 +48,25 @@ public final class ScoreCalculator {
             System.exit(1);
         }
         System.exit(0);
+    }
+
+    private static DefaultFrame captureDefaultFrame(Scanner scanner, int frameNbr) {
+        final int nbrPins1 = captureRoll(scanner, "FIRST", frameNbr);
+        if (nbrPins1 == Frame.MAX_PINS)
+            return DefaultFrame.strike();
+        final int nbrPins2 = captureRoll(scanner, "SECOND", frameNbr);
+        return new DefaultFrame(nbrPins1, nbrPins2);
+    }
+
+    private static FinalFrame captureFinalFrame(Scanner scanner) {
+        final int nbrPins1 = captureRoll(scanner, "FIRST", Frame.MAX_PINS);
+        final int nbrPins2 = captureRoll(scanner, "SECOND", Frame.MAX_PINS);
+        final int bonusNbrPins;
+        if (FinalFrame.hasEarnedBonusRoll(nbrPins1, nbrPins2))
+            bonusNbrPins = captureRoll(scanner, "BONUS", Frame.MAX_PINS);
+        else
+            bonusNbrPins = 0;
+        return new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
     }
 
     private static int captureRoll(Scanner scanner, String attemptWord, int frameNbr) {

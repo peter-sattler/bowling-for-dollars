@@ -1,4 +1,6 @@
-package net.sattler22.bowling.model;
+package net.sattler22.bowling;
+
+import net.jcip.annotations.ThreadSafe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +35,7 @@ import java.util.List;
  * @author Pete Sattler
  * @version October 2025
  */
+@ThreadSafe
 public final class Game {
 
     /**
@@ -96,35 +99,44 @@ public final class Game {
         frames.add(frame);
     }
 
-    public List<Frame> calculateScore() {
+    /**
+     * Update score
+     *
+     * @return Zero or more {@link Frame}s that were updated
+     */
+    public List<Frame> updateScore() {
         final List<Frame> updatedFrames = new ArrayList<>();
         for (int index = 0; index < frames.size(); index++) {
             final Frame currentFrame = frames.get(index);
             if (!currentFrame.hasScore()) {
-                final int start = index == 0 ? 0 : frames.get(index - 1).score();
-                if (currentFrame.isOpen())
-                    currentFrame.updateScore(start, 0);
-                else if (currentFrame instanceof DefaultFrame defaultFrame) {
-                    //SPARE bonus is next roll:
-                    if (defaultFrame.isSpare() && index < frames.size() - 1)
-                        currentFrame.updateScore(start, frames.get(index + 1).firstRoll());
-                    //STRIKE bonus is next two rolls:
-                    if (index < frames.size() - 2)
-                        currentFrame.updateScore(start, frames.get(index + 1).total());
-                }
-                else if (currentFrame instanceof FinalFrame finalFrame) {
-                    //SPARE bonus is next roll:
-                    if (finalFrame.isSpare())
-                        finalFrame.updateScore(start, finalFrame.bonusRoll());
-                    //STRIKE bonus is next two rolls:
-                    if (finalFrame.firstRoll() == Frame.MAX_PINS)
-                        finalFrame.updateScore(start, finalFrame.secondRoll() + finalFrame.bonusRoll());
-                }
-                if (currentFrame.hasScore())
+                int bonus = calculateBonus(currentFrame, index);
+                if (bonus > -1) {
+                    final int start = index == 0 ? 0 : frames.get(index - 1).score();
+                    currentFrame.updateScore(start, bonus);
                     updatedFrames.add(currentFrame);
+                }
             }
         }
         return updatedFrames;
+    }
+
+    private int calculateBonus(Frame currentFrame, final int index) {
+        if (currentFrame.isOpen())
+            return 0;
+        if (currentFrame instanceof DefaultFrame defaultFrame) {
+            //SPARE bonus is next roll:
+            if (defaultFrame.isSpare() && index < frames.size() - 1)
+                return frames.get(index + 1).firstRoll();
+            //STRIKE bonus is next two rolls:
+            if (index < frames.size() - 1 && !frames.get(index + 1).isStrike())
+                return frames.get(index + 1).total();
+            if (index < frames.size() - 2 && frames.get(index + 1).isStrike()) {
+                return frames.get(index + 1).firstRoll() + frames.get(index + 2).firstRoll();
+            }
+        }
+        if (currentFrame instanceof FinalFrame finalFrame)
+            return finalFrame.calculateBonus();
+        return -1;
     }
 
     /**

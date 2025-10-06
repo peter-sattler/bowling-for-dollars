@@ -1,4 +1,4 @@
-package net.sattler22.bowling.model;
+package net.sattler22.bowling;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -42,6 +42,21 @@ public final class FinalFrame extends Frame {
      */
     public static boolean hasEarnedBonusRoll(int nbrPins1, int nbrPins2) {
         return nbrPins1 == Frame.MAX_PINS || (nbrPins1 + nbrPins2) == Frame.MAX_PINS;
+    }
+
+    /**
+     * Calculate bonus
+     *
+     * @return The bonus number of pins
+     */
+    public int calculateBonus() {
+        //SPARE bonus is next roll:
+        if (isSpare())
+            return bonusRoll();
+        //STRIKE bonus is next two rolls:
+        if (firstRoll() == Frame.MAX_PINS)
+            return secondRoll() + bonusRoll;
+        return 0;
     }
 
     /**

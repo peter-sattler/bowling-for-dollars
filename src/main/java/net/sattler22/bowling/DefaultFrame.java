@@ -1,4 +1,4 @@
-package net.sattler22.bowling.model;
+package net.sattler22.bowling;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -13,8 +13,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public final class DefaultFrame extends Frame {
 
-    private final boolean strike;
-
     /**
      * Constructs a new <code>DefaultFrame</code>
      *
@@ -25,7 +23,6 @@ public final class DefaultFrame extends Frame {
         super(nbrPins1, nbrPins2);
         if (nbrPins1 + nbrPins2 > MAX_PINS)
             throw new IllegalArgumentException("Maximum number of pins exceeded");
-        this.strike = nbrPins1 == MAX_PINS;
     }
 
     /**
@@ -35,30 +32,5 @@ public final class DefaultFrame extends Frame {
      */
     public static DefaultFrame strike() {
         return new DefaultFrame(MAX_PINS, 0);
-    }
-
-    /**
-     * Strike condition check
-     *
-     * @return True if all pins have been knocked down on the first attempt. Otherwise, returns false.
-     */
-    public boolean isStrike() {
-        return strike;
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        return super.equals(other);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s [firstRoll=%d, secondRoll=%d, zero=%b, open=%b, spare=%b, strike=%b, score=%s]",
-                getClass().getSimpleName(), firstRoll(), secondRoll(), isZero(), isOpen(), isSpare(), strike, score());
     }
 }
