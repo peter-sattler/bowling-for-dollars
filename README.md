@@ -57,5 +57,5 @@ own scoring algorithm.
 So get out there and play a game or two and remember to always [Take The Skinheads Bowling](https://youtu.be/DlX1cQU8rxI?si=9gq_WCLXm3B-Vwha)!!!
 
 Pete Sattler  
-September 2025  
+October 2025  
 _peter@sattler22.net_  
