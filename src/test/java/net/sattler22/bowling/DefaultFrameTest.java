@@ -18,133 +18,199 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 final class DefaultFrameTest {
 
     @Test
-    void recordStrike_thenFirstRollHasMaxPins() {
-        final DefaultFrame strikeFrame = DefaultFrame.strike();
-        assertEquals(Frame.MAX_PINS, strikeFrame.firstRoll());
-        assertEquals(0, strikeFrame.secondRoll());
-        assertTrue(strikeFrame.isStrike());
-        assertFalse(strikeFrame.isSpare());
-        assertFalse(strikeFrame.isOpen());
-        assertFalse(strikeFrame.isZero());
-        assertFalse(strikeFrame.hasScore());
-        assertEquals(-1, strikeFrame.score());
-        assertEquals(Frame.MAX_PINS, strikeFrame.total());
+    void newInstance_withTooFewPins1_thenThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new DefaultFrame(-1, 2)
+        );
     }
 
     @Test
-    void recordNonStrikeFrame_thenTotalHasLessThanMaxPins() {
-        final int nbrPins1 = 2;
-        final int nbrPins2 = 0;
-        final int expectedTotal = nbrPins1 + nbrPins2;
+    void newInstance_withTooFewPins2_thenThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new DefaultFrame(1, -1)
+        );
+    }
+
+    @Test
+    void newInstance_withTooManyPins1_thenThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new DefaultFrame(Frame.MAX_PINS + 1, 2)
+        );
+    }
+
+    @Test
+    void newInstance_withTooManyPins2_thenThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new DefaultFrame(1, Frame.MAX_PINS + 1)
+        );
+    }
+
+    @Test
+    void newInstance_withTooManyTotalPins_thenThrowIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new DefaultFrame(5, 6)
+        );
+    }
+
+    @Test
+    void newInstance_withHappyPath_thenSuccessful() {
+        final int nbrPins1 = 3;
+        final int nbrPins2 = 4;
         final DefaultFrame openFrame = new DefaultFrame(nbrPins1, nbrPins2);
         assertEquals(nbrPins1, openFrame.firstRoll());
         assertEquals(nbrPins2, openFrame.secondRoll());
-        assertFalse(openFrame.isStrike());
-        assertFalse(openFrame.isSpare());
-        assertTrue(openFrame.isOpen());
-        assertFalse(openFrame.isZero());
-        assertFalse(openFrame.hasScore());
-        assertEquals(-1, openFrame.score());
-        assertEquals(expectedTotal, openFrame.total());
     }
 
     @Test
-    void recordNonStrikeFrame_withMoreThanMaxPins_thenThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new DefaultFrame(Frame.MAX_PINS, 1)
-        );
-    }
-
-    @Test
-    void recordNonStrikeFrame_withTooManyPins_thenThrowIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new DefaultFrame(Frame.MAX_PINS, Frame.MAX_PINS)
-        );
-    }
-
-    @Test
-    void recordNonStrikeFrame_withZeroPins_thenTotalHasNoPins() {
-        final int nbrPins1 = 0;
-        final int nbrPins2 = 0;
-        final DefaultFrame zeroFrame = new DefaultFrame(0, 0);
-        assertEquals(nbrPins1, zeroFrame.firstRoll());
-        assertEquals(nbrPins2, zeroFrame.secondRoll());
-        assertFalse(zeroFrame.isStrike());
-        assertFalse(zeroFrame.isSpare());
-        assertTrue(zeroFrame.isOpen());
-        assertTrue(zeroFrame.isZero());
-        assertFalse(zeroFrame.hasScore());
-        assertEquals(-1, zeroFrame.score());
-        assertEquals(nbrPins1 + nbrPins2, zeroFrame.total());
-    }
-
-    @Test
-    void score_withoutUpdate_thenReturnEmpty() {
+    void strike_withHappyPath_thenSuccessful() {
         final DefaultFrame strikeFrame = DefaultFrame.strike();
-        assertFalse(strikeFrame.hasScore());
-        assertEquals(-1, strikeFrame.score());
+        assertEquals(Frame.MAX_PINS, strikeFrame.firstRoll());
+        assertEquals(0, strikeFrame.secondRoll());
     }
 
     @Test
-    void score_withNegativeStartingPoints_thenThrowIllegalArgumentException() {
-        final DefaultFrame zeroFrame = new DefaultFrame(0, 0);
+    void isZero_withTooManyPins_thenReturnFalse() {
+        assertFalse(new DefaultFrame(1, 0).isZero());
+    }
+
+    @Test
+    void isZero_withHappyPath_thenReturnTrue() {
+        assertTrue(zeroFrame().isZero());
+    }
+
+    @Test
+    void isOpen_withZeroPins_thenReturnTrue() {
+        assertTrue(zeroFrame().isOpen());
+    }
+
+    @Test
+    void isOpen_withHappyPath_thenReturnTrue() {
+        assertTrue(new DefaultFrame(1, 6).isOpen());
+    }
+
+    @Test
+    void isOpen_withSpare_thenReturnFalse() {
+        assertFalse(spareFrame(1).isOpen());
+    }
+
+    @Test
+    void isOpen_withStrike_thenReturnFalse() {
+        assertFalse(DefaultFrame.strike().isOpen());
+    }
+
+    @Test
+    void isSpare_withZeroPins_thenReturnFalse() {
+        assertFalse(zeroFrame().isSpare());
+    }
+
+    @Test
+    void isSpare_withOpenFrame_thenReturnFalse() {
+        assertFalse(new DefaultFrame(2, 6).isSpare());
+    }
+
+    @Test
+    void isSpare_withHappyPath_thenReturnTrue() {
+        assertTrue(spareFrame(5).isSpare());
+    }
+
+    @Test
+    void isSpare_withStrike_thenReturnFalse() {
+        assertFalse(DefaultFrame.strike().isSpare());
+    }
+
+    @Test
+    void isStrike_withZeroPins_thenReturnFalse() {
+        assertFalse(zeroFrame().isStrike());
+    }
+
+    @Test
+    void isStrike_withOpenFrame_thenReturnFalse() {
+        assertFalse(new DefaultFrame(4, 4).isStrike());
+    }
+
+    @Test
+    void isStrike_withSpare_thenReturnFalse() {
+        assertFalse(spareFrame(9).isStrike());
+    }
+
+    @Test
+    void isStrike_withHappyPath_thenReturnTrue() {
+        assertTrue(DefaultFrame.strike().isStrike());
+    }
+
+    @Test
+    void hasScore_withoutUpdate_thenReturnFalse() {
+        assertFalse(zeroFrame().hasScore());
+    }
+
+    @Test
+    void hasScore_withHappyPath_thenReturnTrue() {
+        final DefaultFrame zeroFrame = zeroFrame();
+        zeroFrame.updateScore(0, 0);
+        assertTrue(zeroFrame.hasScore());
+    }
+
+    @Test
+    void score_withoutUpdate_thenReturnNegativeOne() {
+        assertEquals(-1, zeroFrame().score());
+    }
+
+    @Test
+    void score_withHappyPath_thenReturnTrue() {
+        final DefaultFrame zeroFrame = zeroFrame();
+        zeroFrame.updateScore(0, 0);
+        assertEquals(0, zeroFrame.score());
+    }
+
+    @Test
+    void updateScore_withNegativeStartingPoints_thenThrowIllegalArgumentException() {
+        final DefaultFrame zeroFrame = zeroFrame();
         assertThrows(IllegalArgumentException.class, () ->
                 zeroFrame.updateScore(-1, 0));
     }
 
     @Test
-    void score_withNoStartingPointsNoBonusUpdate_thenReturnScore() {
-        final int nbrPins1 = 6;
-        final int expectedScore = Frame.MAX_PINS;
-        final DefaultFrame spareFrame = new DefaultFrame(nbrPins1, Frame.MAX_PINS - nbrPins1);
-        spareFrame.updateScore(0, 0);
-        assertTrue(spareFrame.hasScore());
-        assertEquals(expectedScore, spareFrame.score());
-    }
-
-    @Test
-    void score_withNoStartingPointsBonusUpdate_thenReturnScore() {
-        final int nbrPins1 = 6;
-        final int bonusPins = 3;
-        final int expectedScore = Frame.MAX_PINS + bonusPins;
-        final DefaultFrame spareFrame = new DefaultFrame(nbrPins1, Frame.MAX_PINS - nbrPins1);
-        spareFrame.updateScore(0, bonusPins);
-        assertTrue(spareFrame.hasScore());
-        assertEquals(expectedScore, spareFrame.score());
-    }
-
-    @Test
-    void score_withStartingPointsNoBonusUpdate_thenReturnScore() {
-        final int startingPoints = 4;
-        final int nbrPins1 = 6;
-        final int expectedScore = startingPoints + Frame.MAX_PINS;
-        final DefaultFrame spareFrame = new DefaultFrame(nbrPins1, Frame.MAX_PINS - nbrPins1);
-        spareFrame.updateScore(startingPoints, 0);
-        assertTrue(spareFrame.hasScore());
-        assertEquals(expectedScore, spareFrame.score());
-    }
-
-    @Test
-    void score_withStartingPointsBonusUpdate_thenReturnScore() {
-        final int startingPoints = 5;
-        final int nbrPins1 = 6;
-        final int bonusPins = 3;
-        final int expectedScore = startingPoints + Frame.MAX_PINS + bonusPins;
-        final DefaultFrame spareFrame = new DefaultFrame(nbrPins1, Frame.MAX_PINS - nbrPins1);
-        spareFrame.updateScore(startingPoints, bonusPins);
-        assertTrue(spareFrame.hasScore());
-        assertEquals(expectedScore, spareFrame.score());
-    }
-
-    @Test
-    void score_withNegativeBonus_thenThrowIllegalArgumentException() {
-        final DefaultFrame zeroFrame = new DefaultFrame(0, 0);
+    void updateScore_withNegativeBonusPoints_thenThrowIllegalArgumentException() {
+        final DefaultFrame zeroFrame = zeroFrame();
         assertThrows(IllegalArgumentException.class, () ->
                 zeroFrame.updateScore(0,-1));
     }
 
+   @Test
+   void updateScore_withHappyPath_thenSuccessful() {
+        final int nbrPins1 = 6;
+        final int nbrPins2 = 3;
+        final int start = 25;
+        final int bonus = 10;
+        final DefaultFrame openFrame = new DefaultFrame(nbrPins1, nbrPins2);
+        openFrame.updateScore(start, bonus);
+        assertEquals(nbrPins1 + nbrPins2 + start + bonus, openFrame.score());
+   }
+
     @Test
-    void compare_equalFrames_thenReturnTrue() {
+    void firstRoll_withHappyPath_thenSuccessful() {
+        final int nbrPins1 = 7;
+        final DefaultFrame defaultFrame = new DefaultFrame(nbrPins1, 0);
+        assertEquals(nbrPins1, defaultFrame.firstRoll());
+    }
+
+    @Test
+    void secondRoll_withHappyPath_thenSuccessful() {
+        final int nbrPins2 = 2;
+        final DefaultFrame defaultFrame = new DefaultFrame(0, nbrPins2);
+        assertEquals(nbrPins2, defaultFrame.secondRoll());
+    }
+
+    @Test
+    void total_withHappyPath_thenSuccessful() {
+        final int nbrPins1 = 7;
+        final int nbrPins2 = 2;
+        final DefaultFrame defaultFrame = new DefaultFrame(nbrPins1, nbrPins2);
+        assertEquals(nbrPins1 + nbrPins2, defaultFrame.total());
+    }
+
+    @Test
+    void equals_whenEqual_thenReturnTrue() {
         final int nbrPins1 = 2;
         final int nbrPins2 = 0;
         final DefaultFrame openFrame1 = new DefaultFrame(nbrPins1, nbrPins2);
@@ -153,10 +219,18 @@ final class DefaultFrameTest {
     }
 
     @Test
-    void compare_unequalFrames_thenReturnFalse() {
+    void compare_whenUnequal_thenReturnFalse() {
         final int nbrPins1 = 1;
         final DefaultFrame openFrame1 = new DefaultFrame(nbrPins1, 1);
         final DefaultFrame openFrame2 = new DefaultFrame(nbrPins1, 2);
         assertNotEquals(openFrame1, openFrame2);
+    }
+
+    private static DefaultFrame zeroFrame() {
+        return new DefaultFrame(0, 0);
+    }
+
+    private static DefaultFrame spareFrame(int nbrPins1) {
+        return new DefaultFrame(nbrPins1, Frame.MAX_PINS - nbrPins1);
     }
 }

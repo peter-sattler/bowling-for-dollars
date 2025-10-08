@@ -25,6 +25,8 @@ public final class FinalFrame extends Frame {
      */
     public FinalFrame(int nbrPins1, int nbrPins2, int bonusNbrPins) {
         super(nbrPins1, nbrPins2);
+        if (bonusNbrPins < 0)
+            throw new IllegalArgumentException("Invalid number of pins");
         if (nbrPins1 > MAX_PINS || nbrPins2 > MAX_PINS || bonusNbrPins > MAX_PINS)
             throw new IllegalArgumentException("Maximum number of pins exceeded");
         if (!hasEarnedBonusRoll(nbrPins1, nbrPins2) && bonusNbrPins > 0)
@@ -45,27 +47,25 @@ public final class FinalFrame extends Frame {
     }
 
     /**
-     * Calculate bonus
-     *
-     * @return The bonus number of pins
-     */
-    public int calculateBonus() {
-        //SPARE bonus is next roll:
-        if (isSpare())
-            return bonusRoll();
-        //STRIKE bonus is next two rolls:
-        if (firstRoll() == Frame.MAX_PINS)
-            return secondRoll() + bonusRoll;
-        return 0;
-    }
-
-    /**
      * Turkey condition check
      *
      * @return True if all pins have been knocked down in all three frames. Otherwise, returns false.
      */
     public boolean isTurkey() {
         return turkey;
+    }
+
+    /**
+     * Update the score
+     *
+     * @param start The starting number of points
+     */
+    public void updateScore(int start) {
+        if (start < 0)
+            throw new IllegalArgumentException("Starting points cannot be negative");
+        synchronized (lock) {
+            this.score = start + total();
+        }
     }
 
     /**

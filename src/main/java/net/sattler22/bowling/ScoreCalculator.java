@@ -33,13 +33,14 @@ public final class ScoreCalculator {
                     for(final Frame updatedFrame : game.updateScore())
                         logger.info("Added frame for {}: {}", playerName, updatedFrame);
                 }
-                game.addFrame(captureFinalFrame(scanner));
+                final FinalFrame finalFrame = captureFinalFrame(scanner);
+                game.addFrame(finalFrame);
                 game.updateScore();
-                if (game.isOver()) {
-                    logger.info("{}'s total score: {}", playerName, game.score());
-                    if (game.isPerfect())
-                        logger.info("Congratulations, you have bowled a PERFECT game!!!");
-                }
+                if (finalFrame.isTurkey())
+                    logger.info("Nice, a TURKEY on the final frame!!!");
+                logger.info("{}'s total score: {}", playerName, game.score());
+                if (game.isPerfect())
+                    logger.info("Congratulations, you have bowled a PERFECT game!!!");
                 logger.info("Ten Pin Bowling game complete");
             }
         }

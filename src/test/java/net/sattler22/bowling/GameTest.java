@@ -42,7 +42,7 @@ final class GameTest {
 
     @Test
     void playerName_newInstance_thenSuccessful() {
-        final String playerName = "Bob Wire";
+        final String playerName = "Pete Moss";
         final Game game = new Game(playerName);
         assertEquals(playerName, game.playerName());
     }
@@ -67,4 +67,30 @@ final class GameTest {
         game.addFrame(new FinalFrame(9, 0, 0));
         assertTrue(game.isOver());
     }
+
+    @Test
+    void isPerfect_withAllStrikes_thenReturnTrue() {
+        final Game game = new Game("Burt Rentals");
+        IntStream.range(0, Game.MAX_FRAMES - 1)
+                .forEach(nbrPins -> game.addFrame(DefaultFrame.strike()));
+        game.addFrame(new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS));
+        game.updateScore();
+        assertTrue(game.isPerfect());
+    }
+
+    @Test
+    void isPerfect_withOnePinLeftStanding_thenReturnFalse() {
+        final Game game = new Game("Paige Turner");
+        IntStream.range(0, Game.MAX_FRAMES - 1)
+                .forEach(nbrPins -> game.addFrame(DefaultFrame.strike()));
+        game.addFrame(new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS - 1));
+        game.updateScore();
+        assertFalse(game.isPerfect());
+    }
+
+    //TODO: addFrame
+
+    //TODO: updateScore
+
+    //TODO: score
 }

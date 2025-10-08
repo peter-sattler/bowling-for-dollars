@@ -33,4 +33,20 @@ public final class DefaultFrame extends Frame {
     public static DefaultFrame strike() {
         return new DefaultFrame(MAX_PINS, 0);
     }
+
+    /**
+     * Update the score
+     *
+     * @param start The starting number of points
+     * @param bonus The number of bonus points
+     */
+    public void updateScore(int start, int bonus) {
+        if (start < 0)
+            throw new IllegalArgumentException("Starting points cannot be negative");
+        if (bonus < 0)
+            throw new IllegalArgumentException("Bonus points cannot be negative");
+        synchronized (lock) {
+            this.score = start + total() + bonus;
+        }
+    }
 }

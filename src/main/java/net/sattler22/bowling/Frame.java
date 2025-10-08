@@ -24,8 +24,8 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     private final boolean open;
     private final boolean spare;
     private final boolean strike;
-    private volatile int score = -1;
-    private final Object lock = new Object();
+    protected volatile int score = -1;
+    protected final Object lock = new Object();
 
     /**
      * Constructs a new <code>Frame</code>
@@ -98,22 +98,6 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
      */
     public final int score() {
         return score;
-    }
-
-    /**
-     * Settle the score :)
-     *
-     * @param start The starting number of points
-     * @param bonus The number of bonus points
-     */
-    public final void updateScore(int start, int bonus) {
-        if (start < 0)
-            throw new IllegalArgumentException("Starting points cannot be negative");
-        if (bonus < 0)
-            throw new IllegalArgumentException("Bonus points cannot be negative");
-        synchronized (lock) {
-            this.score = start + total() + bonus;
-        }
     }
 
     /**

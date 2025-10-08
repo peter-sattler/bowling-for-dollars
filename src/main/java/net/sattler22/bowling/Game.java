@@ -95,7 +95,7 @@ public final class Game {
         if (frame == null)
             throw new IllegalArgumentException("Frame is required");
         if (frames.size() == MAX_FRAMES - 1 && !(frame instanceof FinalFrame))
-            throw new IllegalArgumentException("The final frame must include a bonus attempt");
+            throw new IllegalArgumentException("Final frame is required");
         frames.add(frame);
     }
 
@@ -109,33 +109,41 @@ public final class Game {
         for (int index = 0; index < frames.size(); index++) {
             final Frame currentFrame = frames.get(index);
             if (!currentFrame.hasScore()) {
-                int bonus = calculateBonus(currentFrame, index);
-                if (bonus > -1) {
-                    final int start = index == 0 ? 0 : frames.get(index - 1).score();
-                    currentFrame.updateScore(start, bonus);
-                    updatedFrames.add(currentFrame);
+                final int start = index > 0 ? frames.get(index - 1).score() : 0;
+                switch(currentFrame) {
+                    case DefaultFrame defaultFrame -> {
+                        int bonus = calculateBonus(defaultFrame, index);
+                        if (bonus > -1) {
+                            defaultFrame.updateScore(start, bonus);
+                            updatedFrames.add(currentFrame);
+                        }
+                    }
+                    case FinalFrame finalFrame -> {
+                        finalFrame.updateScore(start);
+                        updatedFrames.add(currentFrame);
+                    }
                 }
             }
         }
         return updatedFrames;
     }
 
-    private int calculateBonus(Frame currentFrame, final int index) {
-        if (currentFrame.isOpen())
+    private int calculateBonus(DefaultFrame defaultFrame, final int index) {
+        //No BONUS:
+        if (defaultFrame.isZero() || defaultFrame.isOpen())
             return 0;
-        if (currentFrame instanceof DefaultFrame defaultFrame) {
-            //SPARE bonus is next roll:
-            if (defaultFrame.isSpare() && index < frames.size() - 1)
-                return frames.get(index + 1).firstRoll();
-            //STRIKE bonus is next two rolls:
-            if (index < frames.size() - 1 && !frames.get(index + 1).isStrike())
-                return frames.get(index + 1).total();
-            if (index < frames.size() - 2 && frames.get(index + 1).isStrike()) {
-                return frames.get(index + 1).firstRoll() + frames.get(index + 2).firstRoll();
-            }
+        //SPARE bonus is next roll:
+        if (defaultFrame.isSpare() && index < frames.size() - 1)
+            return frames.get(index + 1).firstRoll();
+        //STRIKE bonus is next two rolls (over a single frame):
+        if (index < frames.size() - 1) {
+            final Frame nextFrame = frames.get(index + 1);
+            if (nextFrame.isOpen() || nextFrame.isSpare() || nextFrame instanceof FinalFrame)
+                return nextFrame.firstRoll() + nextFrame.secondRoll();
         }
-        if (currentFrame instanceof FinalFrame finalFrame)
-            return finalFrame.calculateBonus();
+        //STRIKE bonus is next two rolls (over two frames):
+        if (index < frames.size() - 2 && frames.get(index + 1).isStrike())
+            return frames.get(index + 1).firstRoll() + frames.get(index + 2).firstRoll();
         return -1;
     }
 
