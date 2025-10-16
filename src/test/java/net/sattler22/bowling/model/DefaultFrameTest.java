@@ -1,4 +1,4 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -56,9 +56,9 @@ final class DefaultFrameTest {
     void newInstance_withHappyPath_thenSuccessful() {
         final int nbrPins1 = 3;
         final int nbrPins2 = 4;
-        final DefaultFrame openFrame = new DefaultFrame(nbrPins1, nbrPins2);
-        assertEquals(nbrPins1, openFrame.firstRoll());
-        assertEquals(nbrPins2, openFrame.secondRoll());
+        final DefaultFrame defaultFrame = new DefaultFrame(nbrPins1, nbrPins2);
+        assertEquals(nbrPins1, defaultFrame.firstRoll());
+        assertEquals(nbrPins2, defaultFrame.secondRoll());
     }
 
     @Test
@@ -210,7 +210,7 @@ final class DefaultFrameTest {
     }
 
     @Test
-    void equals_whenEqual_thenReturnTrue() {
+    void equals_whenSame_thenReturnTrue() {
         final int nbrPins1 = 2;
         final int nbrPins2 = 0;
         final DefaultFrame openFrame1 = new DefaultFrame(nbrPins1, nbrPins2);
@@ -219,7 +219,7 @@ final class DefaultFrameTest {
     }
 
     @Test
-    void compare_whenUnequal_thenReturnFalse() {
+    void equals_whenDifferent_thenReturnFalse() {
         final int nbrPins1 = 1;
         final DefaultFrame openFrame1 = new DefaultFrame(nbrPins1, 1);
         final DefaultFrame openFrame2 = new DefaultFrame(nbrPins1, 2);

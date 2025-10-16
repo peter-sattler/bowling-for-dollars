@@ -1,6 +1,9 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.core;
 
 import net.jcip.annotations.ThreadSafe;
+import net.sattler22.bowling.model.DefaultFrame;
+import net.sattler22.bowling.model.FinalFrame;
+import net.sattler22.bowling.model.Frame;
 
 import java.util.ArrayList;
 import java.util.Collections;

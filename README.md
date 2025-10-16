@@ -4,7 +4,7 @@
 ## Background
 
 During an onsite job interview in 2023, I was asked to solve a coding challenge that I had 
-[seen before](http://github.com/peter-sattler/ancient-text-translator/blob/main/README.md). So after being way too honest with hiring manager (lets call him "David"), he went off in search of
+[seen before](http://github.com/peter-sattler/ancient-text-translator/blob/main/README.md). So after being way too honest with the hiring manager (lets call him "David"), he went off in search of
 an alternative. He came back with this; a [Ten Pin Bowling](https://en.m.wikipedia.org/wiki/Tenpin_bowling) scoring calculator. Suddenly, I 
 wished I had paid more attention to my oldest sister who took me to the local bowling alley growing up and 
 encouraged me to learn how the scoring worked.
@@ -17,12 +17,12 @@ low budget game show that I have fond memories of. Their logo is proudly display
 ### Scoring Rules
 
 1. The ultimate goal is to knock down all ten pins on your first turn.
-2. During each frame, each player gets two attempts to knock down all ten pins. Turns are called “frames,” and 
+2. During each frame, a player gets two attempts to knock down all ten pins. Turns are called “frames,” and 
 each player plays ten frames in a game.
 3. Knocking down all the pins on your first throw is called a strike.
 4. If you miss at least one pin on the first throw and then knock down any remaining pins on your second throw, it's 
 called a spare.
-5. Open frames are simply frames that left at least one pin standing.
+5. Open frames are simply frames that leave at least one pin standing.
 6. Scoring is based on the number of pins knocked down. Except, when you get a spare, you get 10 plus the number of 
    pins you knock down during your next throw. If you get a strike, you get 10 plus the number of pins you knock down
    with your next two throws.
@@ -46,7 +46,7 @@ cd bowling-for-dollars
 ```
 3. Run the program:
 ```text
-./mvnw compile exec:java
+mvn compile exec:java
 ```
 
 ## Special Thanks
@@ -54,7 +54,7 @@ cd bowling-for-dollars
 Special Thanks to [Bowling Genius!](https://bowlinggenius.com) for their excellent online ten pin calculator that I used to double-check my 
 own scoring algorithm.
 
-So get out there and play a game or two and remember to always [Take The Skinheads Bowling](https://youtu.be/DlX1cQU8rxI?si=9gq_WCLXm3B-Vwha)!!!
+So get out there and play a game or two and remember to [Take The Skinheads Bowling](https://youtu.be/DlX1cQU8rxI?si=9gq_WCLXm3B-Vwha)!!!
 
 Pete Sattler  
 October 2025  

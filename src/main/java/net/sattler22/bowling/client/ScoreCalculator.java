@@ -1,5 +1,9 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.client;
 
+import net.sattler22.bowling.core.Game;
+import net.sattler22.bowling.model.DefaultFrame;
+import net.sattler22.bowling.model.FinalFrame;
+import net.sattler22.bowling.model.Frame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

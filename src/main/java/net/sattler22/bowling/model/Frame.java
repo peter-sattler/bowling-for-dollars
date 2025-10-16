@@ -1,4 +1,4 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.model;
 
 import net.jcip.annotations.ThreadSafe;
 

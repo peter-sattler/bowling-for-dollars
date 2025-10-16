@@ -1,4 +1,4 @@
-package net.sattler22.bowling;
+package net.sattler22.bowling.model;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -43,7 +43,7 @@ public final class FinalFrame extends Frame {
      * @return True if all pins have been knocked down on the first two rolls. Otherwise, returns false.
      */
     public static boolean hasEarnedBonusRoll(int nbrPins1, int nbrPins2) {
-        return nbrPins1 == Frame.MAX_PINS || (nbrPins1 + nbrPins2) == Frame.MAX_PINS;
+        return (nbrPins1 + nbrPins2) == Frame.MAX_PINS || nbrPins1 == Frame.MAX_PINS;
     }
 
     /**
