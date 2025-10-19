@@ -20,7 +20,7 @@ low budget game show that I have fond memories of. Their logo is proudly display
 2. During each frame, a player gets two attempts to knock down all ten pins. Turns are called “frames,” and 
 each player plays ten frames in a game.
 3. Knocking down all the pins on your first throw is called a strike.
-4. If you miss at least one pin on the first throw and then knock down any remaining pins on your second throw, it's 
+4. If you miss at least one pin on the first throw and then knock down all remaining pins on your second throw, it's 
 called a spare.
 5. Open frames are simply frames that leave at least one pin standing.
 6. Scoring is based on the number of pins knocked down. Except, when you get a spare, you get 10 plus the number of 

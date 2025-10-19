@@ -56,9 +56,9 @@ final class DefaultFrameTest {
     void newInstance_withHappyPath_thenSuccessful() {
         final int nbrPins1 = 3;
         final int nbrPins2 = 4;
-        final DefaultFrame defaultFrame = new DefaultFrame(nbrPins1, nbrPins2);
-        assertEquals(nbrPins1, defaultFrame.firstRoll());
-        assertEquals(nbrPins2, defaultFrame.secondRoll());
+        final DefaultFrame openFrame = new DefaultFrame(nbrPins1, nbrPins2);
+        assertEquals(nbrPins1, openFrame.firstRoll());
+        assertEquals(nbrPins2, openFrame.secondRoll());
     }
 
     @Test
@@ -104,7 +104,7 @@ final class DefaultFrameTest {
     }
 
     @Test
-    void isSpare_withOpenFrame_thenReturnFalse() {
+    void isSpare_withTooFewPins_thenReturnFalse() {
         assertFalse(new DefaultFrame(2, 6).isSpare());
     }
 
@@ -124,7 +124,7 @@ final class DefaultFrameTest {
     }
 
     @Test
-    void isStrike_withOpenFrame_thenReturnFalse() {
+    void isStrike_withTooFewPins_thenReturnFalse() {
         assertFalse(new DefaultFrame(4, 4).isStrike());
     }
 
@@ -188,20 +188,6 @@ final class DefaultFrameTest {
    }
 
     @Test
-    void firstRoll_withHappyPath_thenSuccessful() {
-        final int nbrPins1 = 7;
-        final DefaultFrame defaultFrame = new DefaultFrame(nbrPins1, 0);
-        assertEquals(nbrPins1, defaultFrame.firstRoll());
-    }
-
-    @Test
-    void secondRoll_withHappyPath_thenSuccessful() {
-        final int nbrPins2 = 2;
-        final DefaultFrame defaultFrame = new DefaultFrame(0, nbrPins2);
-        assertEquals(nbrPins2, defaultFrame.secondRoll());
-    }
-
-    @Test
     void total_withHappyPath_thenSuccessful() {
         final int nbrPins1 = 7;
         final int nbrPins2 = 2;
@@ -211,18 +197,15 @@ final class DefaultFrameTest {
 
     @Test
     void equals_whenSame_thenReturnTrue() {
-        final int nbrPins1 = 2;
-        final int nbrPins2 = 0;
-        final DefaultFrame openFrame1 = new DefaultFrame(nbrPins1, nbrPins2);
-        final DefaultFrame openFrame2 = new DefaultFrame(nbrPins1, nbrPins2);
+        final DefaultFrame openFrame1 = new DefaultFrame(2, 0);
+        final DefaultFrame openFrame2 = new DefaultFrame(2, 0);
         assertEquals(openFrame1, openFrame2);
     }
 
     @Test
     void equals_whenDifferent_thenReturnFalse() {
-        final int nbrPins1 = 1;
-        final DefaultFrame openFrame1 = new DefaultFrame(nbrPins1, 1);
-        final DefaultFrame openFrame2 = new DefaultFrame(nbrPins1, 2);
+        final DefaultFrame openFrame1 = new DefaultFrame(1, 1);
+        final DefaultFrame openFrame2 = new DefaultFrame(1, 2);
         assertNotEquals(openFrame1, openFrame2);
     }
 

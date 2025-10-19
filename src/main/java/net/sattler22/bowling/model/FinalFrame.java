@@ -21,15 +21,25 @@ public final class FinalFrame extends Frame {
      *
      * @param nbrPins1 The number of pins knocked down in the first roll
      * @param nbrPins2 The number of pins knocked down in the second roll
+     */
+    public FinalFrame(int nbrPins1, int nbrPins2) {
+        this(nbrPins1, nbrPins2, 0);
+    }
+
+    /**
+     * Constructs a new <code>FinalFrame</code>
+     *
+     * @param nbrPins1 The number of pins knocked down in the first roll
+     * @param nbrPins2 The number of pins knocked down in the second roll
      * @param bonusNbrPins The number of pins knocked down in the bonus (third) roll
      */
     public FinalFrame(int nbrPins1, int nbrPins2, int bonusNbrPins) {
         super(nbrPins1, nbrPins2);
         if (bonusNbrPins < 0)
-            throw new IllegalArgumentException("Invalid number of pins");
-        if (nbrPins1 > MAX_PINS || nbrPins2 > MAX_PINS || bonusNbrPins > MAX_PINS)
-            throw new IllegalArgumentException("Maximum number of pins exceeded");
-        if (!hasEarnedBonusRoll(nbrPins1, nbrPins2) && bonusNbrPins > 0)
+            throw new IllegalArgumentException("Invalid number of bonus pins");
+        if (bonusNbrPins > MAX_PINS)
+            throw new IllegalArgumentException("Maximum number of bonus pins exceeded");
+        if (bonusNbrPins > 0 && !hasEarnedBonusRoll(nbrPins1, nbrPins2))
             throw new IllegalArgumentException("Bonus roll has not been earned");
         this.bonusRoll = bonusNbrPins;
         this.turkey = nbrPins1 == MAX_PINS && nbrPins2 == MAX_PINS && bonusNbrPins == MAX_PINS;

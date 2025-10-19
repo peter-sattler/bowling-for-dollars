@@ -90,10 +90,4 @@ final class GameTest {
         game.updateScore();
         assertFalse(game.isPerfect());
     }
-
-    //TODO: addFrame
-
-    //TODO: updateScore
-
-    //TODO: score
 }

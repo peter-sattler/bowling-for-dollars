@@ -66,12 +66,11 @@ public final class ScoreCalculator {
     private static FinalFrame captureFinalFrame(Scanner scanner) {
         final int nbrPins1 = captureRoll(scanner, "FIRST", Frame.MAX_PINS);
         final int nbrPins2 = captureRoll(scanner, "SECOND", Frame.MAX_PINS);
-        final int bonusNbrPins;
-        if (FinalFrame.hasEarnedBonusRoll(nbrPins1, nbrPins2))
-            bonusNbrPins = captureRoll(scanner, "BONUS", Frame.MAX_PINS);
-        else
-            bonusNbrPins = 0;
-        return new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
+        if (FinalFrame.hasEarnedBonusRoll(nbrPins1, nbrPins2)) {
+            final int bonusNbrPins = captureRoll(scanner, "BONUS", Frame.MAX_PINS);
+            return new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
+        }
+        return new FinalFrame(nbrPins1, nbrPins2);
     }
 
     private static int captureRoll(Scanner scanner, String attemptWord, int frameNbr) {
