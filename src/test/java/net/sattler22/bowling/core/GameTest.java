@@ -5,8 +5,6 @@ import net.sattler22.bowling.model.FinalFrame;
 import net.sattler22.bowling.model.Frame;
 import org.junit.jupiter.api.Test;
 
-import java.util.stream.IntStream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,28 +21,28 @@ final class GameTest {
     private static final String BLANKS = "   ";
 
     @Test
-    void playerName_whenNull_thenThrowIllegalArgumentException() {
+    void newInstance_withNullPlayerName_thenThrowIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () ->
                 new Game(null)
         );
     }
 
     @Test
-    void playerName_whenEmpty_thenThrowIllegalArgumentException() {
+    void newInstance_withEmptyPlayerName_thenThrowIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () ->
                 new Game("")
         );
     }
 
     @Test
-    void playerName_whenBlank_thenThrowIllegalArgumentException() {
+    void newInstance_withBlankPlayerName_thenThrowIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () ->
                 new Game(BLANKS)
         );
     }
 
     @Test
-    void playerName_newInstance_thenSuccessful() {
+    void newInstance_withHappyPath_thenSuccessful() {
         final String playerName = "Pete Moss";
         final Game game = new Game(playerName);
         assertEquals(playerName, game.playerName());
@@ -56,38 +54,60 @@ final class GameTest {
     }
 
     @Test
-    void isOver_withOneFrame_thenReturnFalse() {
-        final Game game = new Game("Barb Wire");
-        game.addFrame(DefaultFrame.strike());
-        assertFalse(game.isOver());
-    }
-
-    @Test
     void isOver_withMaxFrames_thenReturnTrue() {
-        final Game game = new Game("Eileen Dover");
-        IntStream.range(0, Game.MAX_FRAMES - 1)
-                .forEach(nbrPins -> game.addFrame(new DefaultFrame(nbrPins, 0)));
-        game.addFrame(new FinalFrame(9, 0, 0));
-        assertTrue(game.isOver());
+        assertTrue(zeroGame("Eileen Dover").isOver());
     }
 
     @Test
-    void isPerfect_withAllStrikes_thenReturnTrue() {
+    void isPerfect_withTooFewPins_thenReturnFalse() {
+        final Game game = zeroGame("Paige Turner");
+        game.updateScore();
+        assertFalse(game.isPerfect());
+    }
+
+    @Test
+    void isPerfect_withHappyPath_thenReturnTrue() {
         final Game game = new Game("Burt Rentals");
-        IntStream.range(0, Game.MAX_FRAMES - 1)
-                .forEach(nbrPins -> game.addFrame(DefaultFrame.strike()));
+        for (int i = 0; i < Game.MAX_FRAMES - 1; i++)
+            game.addFrame(DefaultFrame.strike());
         game.addFrame(new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS));
         game.updateScore();
         assertTrue(game.isPerfect());
     }
 
     @Test
-    void isPerfect_withOnePinLeftStanding_thenReturnFalse() {
-        final Game game = new Game("Paige Turner");
-        IntStream.range(0, Game.MAX_FRAMES - 1)
-                .forEach(nbrPins -> game.addFrame(DefaultFrame.strike()));
-        game.addFrame(new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS - 1));
-        game.updateScore();
-        assertFalse(game.isPerfect());
+    void addFrame_withCompleteGame_thenThrowIllegalStateException() {
+        final Game game = zeroGame("Gene Poole");
+        final DefaultFrame extraRoll = DefaultFrame.strike();
+        assertThrows(IllegalStateException.class, () ->
+            game.addFrame(extraRoll)
+        );
+    }
+
+    @Test
+    void addFrame_withNullFrame_thenThrowIllegalArgumentException() {
+        final Game game = new Game("Chris Cross");
+        assertThrows(IllegalArgumentException.class, () ->
+                game.addFrame(null)
+        );
+    }
+
+    @Test
+    void addFrame_withBadFinalFrame_thenThrowIllegalArgumentException() {
+        final Game game = new Game("Joe Kerr");
+        for (int i = 0; i < Game.MAX_FRAMES - 1; i++)
+            game.addFrame(DefaultFrame.strike());
+        final DefaultFrame evilFinalFrame = DefaultFrame.strike();
+        assertThrows(IllegalArgumentException.class, () ->
+                game.addFrame(evilFinalFrame)
+        );
+    }
+
+    private static Game zeroGame(String playerName) {
+        final Game game = new Game(playerName);
+        for (int i = 0; i < Game.MAX_FRAMES - 1; i++)
+            game.addFrame(new DefaultFrame(0, 0));
+        game.addFrame(new FinalFrame(0, 0));
+        return game;
     }
 }

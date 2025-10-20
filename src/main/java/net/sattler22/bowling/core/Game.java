@@ -8,6 +8,7 @@ import net.sattler22.bowling.model.Frame;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.OptionalInt;
 
 /**
  * Ten Pin Bowling Game
@@ -16,19 +17,19 @@ import java.util.List;
  * Tracks and scores all frames for a ten pin bowling player.
  * </p>
  * <p>
- * Rules:
+ * Scoring Rules:
  * <ol>
  * <li>The ultimate goal is to knock down all ten pins on your first turn.</li>
- * <li>During each frame, each player gets two attempts to knock down all ten pins. Turns are called frames,
- * and each player plays ten frames in a game.</li>
- * <li>Knocking down all the pins on your first throw is called a strike.</li>
- * <li>If you miss at least one pin on the first throw and then knock down any remaining pins on your second
- * throw, it's called a spare.</li>
- * <li>Open frames are simply frames that left at least one pin standing.</li>
+ * <li>During each frame, a player gets two attempts to knock down all ten pins. Each player plays ten frames in a
+ * game.</li>
+ * <li>Knocking down all ten pins on your first throw is called a strike.</li>
+ * <li>If you miss at least one pin on the first throw and then knock down all remaining pins on your second throw, it's
+ * called a spare.</li>
+ * <li>Open frames are simply frames that leave at least one pin standing.</li>
  * <li>Scoring is based on the number of pins knocked down. Except, when you get a spare, you get 10 plus the
- * number of pins you knock down during your next throw. If you get a strike, you get 10 plus the number of pins
- * you knock down with your next two throws.</li>
- * If a player bowls a strike in the tenth (final) frame, they get two more throws within that frame. If they get a
+ * number of pins you knock down during your next throw. If you get a strike, you get ten plus the number of pins you
+ * knock down on your next two throws.</li>
+ * <li>If a player bowls a strike in the tenth (final) frame, they get two more throws within that frame. If they get a
  * spare in the final frame, the player gets to throw one more ball.</li>
  * <li>Honor the foul line. If a player steps over the foul line or crosses it in any way, those pins will not count
  * toward that player's score</li>
@@ -99,7 +100,7 @@ public final class Game {
             throw new IllegalArgumentException("Frame is required");
         if (frames.size() == MAX_FRAMES - 1 && !(frame instanceof FinalFrame))
             throw new IllegalArgumentException("Final frame is required");
-        frames.add(frame);
+        frames.add(Frame.copyOf(frame));  //Defensive copy
     }
 
     /**
@@ -112,7 +113,7 @@ public final class Game {
         for (int index = 0; index < frames.size(); index++) {
             final Frame currentFrame = frames.get(index);
             if (!currentFrame.hasScore()) {
-                final int start = index > 0 ? frames.get(index - 1).score() : 0;
+                final int start = index > 0 ? frames.get(index - 1).score().orElse(0) : 0;
                 switch(currentFrame) {
                     case DefaultFrame defaultFrame -> {
                         int bonus = calculateBonus(defaultFrame, index);
@@ -156,7 +157,8 @@ public final class Game {
     public int score() {
         return frames.reversed().stream()
                 .filter(Frame::hasScore)
-                .mapToInt(Frame::score)
+                .map(Frame::score)
+                .flatMapToInt(OptionalInt::stream)
                 .findFirst()
                 .orElse(0);
     }

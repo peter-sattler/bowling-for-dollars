@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -91,6 +93,15 @@ final class FinalFrameTest {
     @Test
     void newInstance_withTurkey_thenSuccessful() {
         assertNewInstanceHappyPath(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS);
+    }
+
+    @Test
+    void copyInstance_withHappyPath_thenSuccessful() {
+        final Frame frame = spareFrame(4, 3);
+        final Frame frameCopy = Frame.copyOf(frame);
+        assertInstanceOf(FinalFrame.class, frameCopy);
+        assertEquals(frame, frameCopy);
+        assertNotSame(frameCopy, frame);
     }
 
     @Test
@@ -276,15 +287,15 @@ final class FinalFrameTest {
     }
 
     @Test
-    void score_withoutUpdate_thenReturnNegativeOne() {
-        assertEquals(-1, zeroFrame().score());
+    void score_withoutUpdate_thenReturnEmpty() {
+        assertTrue(zeroFrame().score().isEmpty());
     }
 
     @Test
     void score_withHappyPath_thenReturnTrue() {
         final FinalFrame zeroFrame = zeroFrame();
         zeroFrame.updateScore(0);
-        assertEquals(0, zeroFrame.score());
+        assertEquals(0, zeroFrame.score().orElse(-1));
     }
 
     @Test
@@ -295,6 +306,14 @@ final class FinalFrameTest {
     }
 
     @Test
+    void updateScore_withExistingScore_thenThrowIllegalStateException() {
+        final FinalFrame zeroFrame = zeroFrame();
+        zeroFrame.updateScore(0);
+        assertThrows(IllegalStateException.class, () ->
+                zeroFrame.updateScore(0));
+    }
+
+    @Test
     void updateScore_withHappyPath_thenSuccessful() {
         final int nbrPins1 = 6;
         final int nbrPins2 = 4;
@@ -302,7 +321,7 @@ final class FinalFrameTest {
         final int start = 35;
         final FinalFrame openFrame = new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
         openFrame.updateScore(start);
-        assertEquals(nbrPins1 + nbrPins2 + start + bonusNbrPins, openFrame.score());
+        assertEquals(nbrPins1 + nbrPins2 + start + bonusNbrPins, openFrame.score().orElse(-1));
     }
 
     @Test

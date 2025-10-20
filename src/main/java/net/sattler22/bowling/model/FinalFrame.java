@@ -45,6 +45,10 @@ public final class FinalFrame extends Frame {
         this.turkey = nbrPins1 == MAX_PINS && nbrPins2 == MAX_PINS && bonusNbrPins == MAX_PINS;
     }
 
+    FinalFrame(FinalFrame source) {
+        this(source.firstRoll(), source.secondRoll(), source.bonusRoll());
+    }
+
     /**
      * Bonus roll earned condition check
      *
@@ -73,6 +77,8 @@ public final class FinalFrame extends Frame {
     public void updateScore(int start) {
         if (start < 0)
             throw new IllegalArgumentException("Starting points cannot be negative");
+        if (hasScore())
+            throw new IllegalStateException("Score has already been updated");
         synchronized (lock) {
             this.score = start + total();
         }

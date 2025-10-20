@@ -2,6 +2,8 @@ package net.sattler22.bowling.model;
 
 import net.jcip.annotations.ThreadSafe;
 
+import java.util.OptionalInt;
+
 /**
  * A Ten Pin Bowling <code>Frame</code> represents a series of opportunities for a bowler to throw the ball down the
  * lane and knock down the pins.
@@ -44,6 +46,19 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
         this.open = nbrPins1 + nbrPins2 < MAX_PINS;  //Zero frame is also an open one
         this.strike = nbrPins1 == MAX_PINS;
         this.spare = !this.strike && nbrPins1 + nbrPins2 == MAX_PINS;
+    }
+
+    /**
+     * Copies a <code>Frame</code>
+     *
+     * @param source The source frame
+     * @return A copy of the source frame.
+     */
+    public static Frame copyOf(Frame source) {
+        return switch(source) {
+            case DefaultFrame defaultFrame -> new DefaultFrame(defaultFrame);
+            case FinalFrame finalFrame -> new FinalFrame(finalFrame);
+        };
     }
 
     /**
@@ -94,10 +109,10 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     /**
      * Get score
      *
-     * @return The score for this frame or -1 if it hasn't been scored yet.
+     * @return The optional score for this frame
      */
-    public final int score() {
-        return score;
+    public final OptionalInt score() {
+        return !hasScore() ? OptionalInt.empty() : OptionalInt.of(score);
     }
 
     /**

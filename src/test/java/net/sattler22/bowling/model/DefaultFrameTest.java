@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -59,6 +61,15 @@ final class DefaultFrameTest {
         final DefaultFrame openFrame = new DefaultFrame(nbrPins1, nbrPins2);
         assertEquals(nbrPins1, openFrame.firstRoll());
         assertEquals(nbrPins2, openFrame.secondRoll());
+    }
+
+    @Test
+    void copyInstance_withHappyPath_thenSuccessful() {
+        final Frame frame = spareFrame(4);
+        final Frame frameCopy = Frame.copyOf(frame);
+        assertInstanceOf(DefaultFrame.class, frameCopy);
+        assertEquals(frame, frameCopy);
+        assertNotSame(frameCopy, frame);
     }
 
     @Test
@@ -151,15 +162,16 @@ final class DefaultFrameTest {
     }
 
     @Test
-    void score_withoutUpdate_thenReturnNegativeOne() {
-        assertEquals(-1, zeroFrame().score());
+    void score_withoutUpdate_thenReturnEmpty() {
+        assertTrue(zeroFrame().score().isEmpty());
     }
 
     @Test
     void score_withHappyPath_thenReturnTrue() {
         final DefaultFrame zeroFrame = zeroFrame();
         zeroFrame.updateScore(0, 0);
-        assertEquals(0, zeroFrame.score());
+        assertTrue(zeroFrame.score().isPresent());
+        assertEquals(0, zeroFrame.score().orElse(-1));
     }
 
     @Test
@@ -176,6 +188,14 @@ final class DefaultFrameTest {
                 zeroFrame.updateScore(0,-1));
     }
 
+    @Test
+    void updateScore_withExistingScore_thenThrowIllegalStateException() {
+        final DefaultFrame zeroFrame = zeroFrame();
+        zeroFrame.updateScore(0, 0);
+        assertThrows(IllegalStateException.class, () ->
+                zeroFrame.updateScore(0, 0));
+    }
+
    @Test
    void updateScore_withHappyPath_thenSuccessful() {
         final int nbrPins1 = 6;
@@ -184,7 +204,7 @@ final class DefaultFrameTest {
         final int bonus = 10;
         final DefaultFrame openFrame = new DefaultFrame(nbrPins1, nbrPins2);
         openFrame.updateScore(start, bonus);
-        assertEquals(nbrPins1 + nbrPins2 + start + bonus, openFrame.score());
+        assertEquals(nbrPins1 + nbrPins2 + start + bonus, openFrame.score().orElse(-1));
    }
 
     @Test

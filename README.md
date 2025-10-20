@@ -17,15 +17,14 @@ low budget game show that I have fond memories of. Their logo is proudly display
 ### Scoring Rules
 
 1. The ultimate goal is to knock down all ten pins on your first turn.
-2. During each frame, a player gets two attempts to knock down all ten pins. Turns are called “frames,” and 
-each player plays ten frames in a game.
-3. Knocking down all the pins on your first throw is called a strike.
+2. During each frame, a player gets two attempts to knock down all ten pins. Each player plays ten frames in a game.
+3. Knocking down all ten pins on your first throw is called a strike.
 4. If you miss at least one pin on the first throw and then knock down all remaining pins on your second throw, it's 
 called a spare.
 5. Open frames are simply frames that leave at least one pin standing.
-6. Scoring is based on the number of pins knocked down. Except, when you get a spare, you get 10 plus the number of 
-   pins you knock down during your next throw. If you get a strike, you get 10 plus the number of pins you knock down
-   with your next two throws.
+6. Scoring is based on the number of pins knocked down. Except, when you get a spare, you get ten plus the number of 
+   pins you knock down during your next throw. If you get a strike, you get ten plus the number of pins you knock down
+   on your next two throws.
 7. If a player bowls a strike in the tenth (final) frame, they get two more throws within that frame. If they get a
    spare in the final frame, the player gets to throw one more ball.
 8. Honor the foul line. If a player steps over the foul line or crosses it in any way, those pins will not count 

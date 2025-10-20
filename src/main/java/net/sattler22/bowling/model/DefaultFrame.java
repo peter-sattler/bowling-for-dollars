@@ -34,6 +34,10 @@ public final class DefaultFrame extends Frame {
         return new DefaultFrame(MAX_PINS, 0);
     }
 
+    DefaultFrame(DefaultFrame source) {
+        this(source.firstRoll(), source.secondRoll());
+    }
+
     /**
      * Update the score
      *
@@ -45,6 +49,8 @@ public final class DefaultFrame extends Frame {
             throw new IllegalArgumentException("Starting points cannot be negative");
         if (bonus < 0)
             throw new IllegalArgumentException("Bonus points cannot be negative");
+        if (hasScore())
+            throw new IllegalStateException("Score has already been updated");
         synchronized (lock) {
             this.score = start + total() + bonus;
         }
