@@ -26,7 +26,7 @@ import java.util.OptionalInt;
  * <li>If you miss at least one pin on the first throw and then knock down all remaining pins on your second throw, it's
  * called a spare.</li>
  * <li>Open frames are simply frames that leave at least one pin standing.</li>
- * <li>Scoring is based on the number of pins knocked down. Except, when you get a spare, you get 10 plus the
+ * <li>Scoring is based on the number of pins knocked down. Except, when you get a spare, you get ten plus the
  * number of pins you knock down during your next throw. If you get a strike, you get ten plus the number of pins you
  * knock down on your next two throws.</li>
  * <li>If a player bowls a strike in the tenth (final) frame, they get two more throws within that frame. If they get a
@@ -139,13 +139,13 @@ public final class Game {
         //SPARE bonus is next roll:
         if (defaultFrame.isSpare() && index < frames.size() - 1)
             return frames.get(index + 1).firstRoll();
-        //STRIKE bonus is next two rolls (over a single frame):
+        //STRIKE bonus is next two rolls (over a ONE frame):
         if (index < frames.size() - 1) {
             final Frame nextFrame = frames.get(index + 1);
             if (nextFrame.isOpen() || nextFrame.isSpare() || nextFrame instanceof FinalFrame)
                 return nextFrame.firstRoll() + nextFrame.secondRoll();
         }
-        //STRIKE bonus is next two rolls (over two frames):
+        //STRIKE bonus is next two rolls (over TWO frames):
         if (index < frames.size() - 2 && frames.get(index + 1).isStrike())
             return frames.get(index + 1).firstRoll() + frames.get(index + 2).firstRoll();
         return -1;

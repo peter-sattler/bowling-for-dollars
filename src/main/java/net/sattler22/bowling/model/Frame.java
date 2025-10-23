@@ -20,12 +20,12 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
      */
     public static final int MAX_PINS = 10;
 
-    private final int firstRoll;
-    private final int secondRoll;
-    private final boolean zero;
-    private final boolean open;
-    private final boolean spare;
-    private final boolean strike;
+    protected final int firstRoll;
+    protected final int secondRoll;
+    protected final boolean zero;
+    protected final boolean open;
+    protected final boolean spare;
+    protected final boolean strike;
     protected volatile int score = -1;
     protected final Object lock = new Object();
 

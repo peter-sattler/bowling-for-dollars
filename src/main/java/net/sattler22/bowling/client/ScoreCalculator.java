@@ -23,6 +23,11 @@ public final class ScoreCalculator {
     private static final Logger logger = LoggerFactory.getLogger(ScoreCalculator.class);
     private static final String USER_TERMINATE = "quit";
 
+    /**
+     * Command-line Ten Pin Bowling Scoring Calculator
+     *
+     * @param args Not supported
+     */
     public static void main(String[] args) {
         logger.info("*** Ten Pin Bowling Score Calculator ***");
         try(final Scanner scanner = new Scanner(System.in)) {

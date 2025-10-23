@@ -34,8 +34,13 @@ public final class DefaultFrame extends Frame {
         return new DefaultFrame(MAX_PINS, 0);
     }
 
+    /**
+     * Copy constructs a new <code>DefaultFrame</code>
+     *
+     * @param source The source frame
+     */
     DefaultFrame(DefaultFrame source) {
-        this(source.firstRoll(), source.secondRoll());
+        this(source.firstRoll, source.secondRoll);
     }
 
     /**
@@ -52,7 +57,7 @@ public final class DefaultFrame extends Frame {
         if (hasScore())
             throw new IllegalStateException("Score has already been updated");
         synchronized (lock) {
-            this.score = start + total() + bonus;
+            this.score = start + super.total() + bonus;
         }
     }
 }

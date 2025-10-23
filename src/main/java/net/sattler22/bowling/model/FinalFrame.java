@@ -45,8 +45,13 @@ public final class FinalFrame extends Frame {
         this.turkey = nbrPins1 == MAX_PINS && nbrPins2 == MAX_PINS && bonusNbrPins == MAX_PINS;
     }
 
+    /**
+     * Copy constructs a new <code>FinalFrame</code>
+     *
+     * @param source The source frame
+     */
     FinalFrame(FinalFrame source) {
-        this(source.firstRoll(), source.secondRoll(), source.bonusRoll());
+        this(source.firstRoll, source.secondRoll, source.bonusRoll);
     }
 
     /**
@@ -118,6 +123,6 @@ public final class FinalFrame extends Frame {
     @Override
     public String toString() {
         return String.format("%s [firstRoll=%d, secondRoll=%d, bonusRoll=%d, zero=%b, open=%b, spare=%b, turkey=%b, score=%s]",
-                getClass().getSimpleName(), firstRoll(), secondRoll(), bonusRoll, isZero(), isOpen(), isSpare(), turkey, score());
+                getClass().getSimpleName(), firstRoll, secondRoll, bonusRoll, isZero(), isOpen(), isSpare(), turkey, score);
     }
 }
