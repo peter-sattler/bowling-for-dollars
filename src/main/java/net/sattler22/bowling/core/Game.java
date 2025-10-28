@@ -104,7 +104,7 @@ public final class Game {
     }
 
     /**
-     * Update score
+     * Update the score
      *
      * @return Zero or more {@link Frame}s that were updated
      */

@@ -49,7 +49,7 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     }
 
     /**
-     * Copies a <code>Frame</code>
+     * Copy an existing <code>Frame</code>
      *
      * @param source The source frame
      * @return A copy of the source frame.
