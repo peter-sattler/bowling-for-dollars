@@ -4,10 +4,8 @@ import net.sattler22.bowling.core.Game;
 import net.sattler22.bowling.model.DefaultFrame;
 import net.sattler22.bowling.model.FinalFrame;
 import net.sattler22.bowling.model.Frame;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Scanner;
+import java.io.Console;
 
 /**
  * Ten Pin Bowling Score Calculator
@@ -16,71 +14,73 @@ import java.util.Scanner;
  * </p>
  *
  * @author Pete Sattler
- * @version October 2025
+ * @since October 2025
+ * @version June 2026
  */
 public final class ScoreCalculator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ScoreCalculator.class);
     private static final String USER_TERMINATE = "quit";
 
     /**
-     * Command-line Ten Pin Bowling Scoring Calculator
-     *
-     * @param args Not supported
+     * Executes the Ten Pin Bowling Scoring Calculator
      */
-    public static void main(String[] args) {
-        logger.info("*** Ten Pin Bowling Score Calculator ***");
-        try(final Scanner scanner = new Scanner(System.in)) {
-            logger.info("Enter player name or quit to terminate: ");
-            final String playerName = scanner.nextLine();
-            if (USER_TERMINATE.equalsIgnoreCase(playerName))
-                logger.info("Ten Pin Bowling game terminated");
-            else {
-                final Game game = new Game(playerName);
-                for (int index = 0; index < Game.MAX_FRAMES - 1; index++) {
-                    game.addFrame(captureDefaultFrame(scanner, index + 1));
-                    for(final Frame updatedFrame : game.updateScore())
-                        logger.info("Added frame for {}: {}", playerName, updatedFrame);
-                }
-                final FinalFrame finalFrame = captureFinalFrame(scanner);
-                game.addFrame(finalFrame);
-                game.updateScore();
-                if (finalFrame.isTurkey())
-                    logger.info("Nice, a TURKEY on the final frame!!!");
-                logger.info("{}'s total score: {}", playerName, game.score());
-                if (game.isPerfect())
-                    logger.info("Congratulations, you have bowled a PERFECT game!!!");
-                logger.info("Ten Pin Bowling game complete");
+    static void main() {
+        final Console console = System.console();
+        if (console == null || !console.isTerminal()) {
+            System.err.println("Please run from a terminal/command prompt");
+            return;
+        }
+        console.printf("*** Ten Pin Bowling Score Calculator ***%n");
+        console.printf("Enter player name or quit to terminate: ");
+        final String playerName = console.readLine();
+        if (USER_TERMINATE.equalsIgnoreCase(playerName)) {
+            console.printf("Ten Pin Bowling game terminated%n");
+            return;
+        }
+        try {
+            final Game game = new Game(playerName);
+            for (int index = 0; index < Game.MAX_FRAMES - 1; index++) {
+                game.addFrame(captureDefaultFrame(console, index + 1));
+                for (final Frame updatedFrame : game.updateScore())
+                    console.printf("Added frame for %s: %s%n", playerName, updatedFrame);
             }
+            final FinalFrame finalFrame = captureFinalFrame(console);
+            game.addFrame(finalFrame);
+            game.updateScore();
+            if (finalFrame.isTurkey())
+                console.printf("Nice, a TURKEY on the final frame!!!%n");
+            console.printf("%s's total score: %s%n", playerName, game.score());
+            if (game.isPerfect())
+                console.printf("Congratulations, you have bowled a PERFECT game!!!%n");
+            console.printf("Ten Pin Bowling game complete%n");
         }
-        catch (RuntimeException exception) {
-            logger.error(exception.getMessage(), exception);
-            System.exit(1);
+        catch (RuntimeException runtimeException) {
+            runtimeException.printStackTrace(System.err);
         }
-        System.exit(0);
     }
 
-    private static DefaultFrame captureDefaultFrame(Scanner scanner, int frameNbr) {
-        final int nbrPins1 = captureRoll(scanner, "FIRST", frameNbr);
+    private static DefaultFrame captureDefaultFrame(Console console, int frameNbr) {
+        final int nbrPins1 = captureRoll(console, "FIRST", frameNbr);
         if (nbrPins1 == Frame.MAX_PINS)
             return DefaultFrame.strike();
-        final int nbrPins2 = captureRoll(scanner, "SECOND", frameNbr);
+        final int nbrPins2 = captureRoll(console, "SECOND", frameNbr);
         return new DefaultFrame(nbrPins1, nbrPins2);
     }
 
-    private static FinalFrame captureFinalFrame(Scanner scanner) {
-        final int nbrPins1 = captureRoll(scanner, "FIRST", Frame.MAX_PINS);
-        final int nbrPins2 = captureRoll(scanner, "SECOND", Frame.MAX_PINS);
+    private static FinalFrame captureFinalFrame(Console console) {
+        final int nbrPins1 = captureRoll(console, "FIRST", Frame.MAX_PINS);
+        final int nbrPins2 = captureRoll(console, "SECOND", Frame.MAX_PINS);
         if (FinalFrame.hasEarnedBonusRoll(nbrPins1, nbrPins2)) {
-            final int bonusNbrPins = captureRoll(scanner, "BONUS", Frame.MAX_PINS);
+            final int bonusNbrPins = captureRoll(console, "BONUS", Frame.MAX_PINS);
             return new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
         }
         return new FinalFrame(nbrPins1, nbrPins2);
     }
 
-    private static int captureRoll(Scanner scanner, String attemptWord, int frameNbr) {
-        logger.info("Enter pins knocked down for {} attempt of frame #{}: ", attemptWord, frameNbr);
-        final int nbrPins = scanner.nextInt();
+    private static int captureRoll(Console console, String attemptWord, int frameNbr) {
+        final String userInput =
+            console.readLine("Enter pins knocked down for %s attempt of frame #%d: ", attemptWord, frameNbr);
+        final int nbrPins = Integer.parseInt(userInput);
         if (nbrPins < 0)
             throw new IllegalArgumentException("Invalid number of pins");
         if (nbrPins > Frame.MAX_PINS)

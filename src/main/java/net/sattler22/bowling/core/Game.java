@@ -37,7 +37,8 @@ import java.util.OptionalInt;
  * </p>
  *
  * @author Pete Sattler
- * @version October 2025
+ * @since October 2025
+ * @version June 2026
  */
 @ThreadSafe
 public final class Game {
@@ -51,7 +52,7 @@ public final class Game {
     private final List<Frame> frames = Collections.synchronizedList(new ArrayList<>());
 
     /**
-     * Constructs a new <code>Game</code>
+     * Constructs a new {@code Game}
      *
      * @param playerName The player's name
      */

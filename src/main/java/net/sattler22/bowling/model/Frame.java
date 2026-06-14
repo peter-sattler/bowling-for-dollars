@@ -5,12 +5,12 @@ import net.jcip.annotations.ThreadSafe;
 import java.util.OptionalInt;
 
 /**
- * A Ten Pin Bowling <code>Frame</code> represents a series of opportunities for a bowler to throw the ball down the
+ * A Ten Pin Bowling {@code Frame} represents a series of opportunities for a bowler to throw the ball down the
  * lane and knock down the pins.
  *
  * @author Pete Sattler
  * @since July 2025
- * @version October 2025
+ * @version June 2026
  */
 @ThreadSafe
 public abstract sealed class Frame permits DefaultFrame, FinalFrame {
@@ -30,7 +30,7 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     protected final Object lock = new Object();
 
     /**
-     * Constructs a new <code>Frame</code>
+     * Constructs a new {@code Frame}
      *
      * @param nbrPins1 The number of pins knocked down in the first roll
      * @param nbrPins2 The number of pins knocked down in the second roll
@@ -49,7 +49,7 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     }
 
     /**
-     * Copy an existing <code>Frame</code>
+     * Copy an existing {@code Frame}
      *
      * @param source The source frame
      * @return A copy of the source frame.
@@ -151,11 +151,8 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     public boolean equals(Object other) {
         if (this == other)
             return true;
-        if (other == null)
+        if (!(other instanceof Frame that))
             return false;
-        if (this.getClass() != other.getClass())
-            return false;
-        final Frame that = (Frame) other;
         return this.firstRoll == that.firstRoll && this.secondRoll == that.secondRoll;
     }
 
