@@ -74,9 +74,9 @@ public final class Game {
     /**
      * Game over condition check
      *
-     * @return True if the game is over (all frames recorded). Otherwise, returns false.
+     * @return True if the game is over (all frames recorded, but not necessarily scored). Otherwise, returns false.
      */
-    public boolean isOver() {
+    public synchronized boolean isOver() {
         return frames.size() == MAX_FRAMES;
     }
 
@@ -94,7 +94,7 @@ public final class Game {
      *
      * @param frame The new {@link Frame}
      */
-    public void addFrame(Frame frame) {
+    public synchronized void addFrame(Frame frame) {
         if (isOver())
             throw new IllegalStateException("%s's game is over".formatted(playerName));
         if (frame == null)
@@ -109,23 +109,23 @@ public final class Game {
      *
      * @return Zero or more {@link Frame}s that were updated
      */
-    public List<Frame> updateScore() {
+    public synchronized List<Frame> updateScore() {
         final List<Frame> updatedFrames = new ArrayList<>();
         for (int index = 0; index < frames.size(); index++) {
             final Frame currentFrame = frames.get(index);
             if (!currentFrame.hasScore()) {
                 final int start = index > 0 ? frames.get(index - 1).score().orElse(0) : 0;
-                switch(currentFrame) {
+                switch (currentFrame) {
                     case DefaultFrame defaultFrame -> {
                         int bonus = calculateBonus(defaultFrame, index);
                         if (bonus > -1) {
                             defaultFrame.updateScore(start, bonus);
-                            updatedFrames.add(currentFrame);
+                            updatedFrames.add(Frame.copyOf(currentFrame));
                         }
                     }
                     case FinalFrame finalFrame -> {
                         finalFrame.updateScore(start);
-                        updatedFrames.add(currentFrame);
+                        updatedFrames.add(Frame.copyOf(currentFrame));
                     }
                 }
             }
@@ -140,7 +140,7 @@ public final class Game {
         //SPARE bonus is next roll:
         if (defaultFrame.isSpare() && index < frames.size() - 1)
             return frames.get(index + 1).firstRoll();
-        //STRIKE bonus is next two rolls (over a ONE frame):
+        //STRIKE bonus when the NEXT frame contains both needed rolls:
         if (index < frames.size() - 1) {
             final Frame nextFrame = frames.get(index + 1);
             if (nextFrame.isOpen() || nextFrame.isSpare() || nextFrame instanceof FinalFrame)
@@ -155,7 +155,7 @@ public final class Game {
     /**
      * Score a single player's game
      */
-    public int score() {
+    public synchronized int score() {
         return frames.reversed().stream()
                 .filter(Frame::hasScore)
                 .map(Frame::score)

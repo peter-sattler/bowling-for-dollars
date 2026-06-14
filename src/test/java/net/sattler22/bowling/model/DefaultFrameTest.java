@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Pete Sattler
  * @since July 2025
- * @version October 2025
+ * @version June 2026
  */
 @DisplayName("Default Frame Unit Tests")
 final class DefaultFrameTest {
@@ -42,7 +42,7 @@ final class DefaultFrameTest {
         @Test
         void newInstance_withTooManyPins1_thenThrowIllegalArgumentException() {
             assertThrows(IllegalArgumentException.class, () ->
-                    new DefaultFrame(Frame.MAX_PINS + 1, 2)
+                    new DefaultFrame(Frame.MAX_PINS + 1, 0)
             );
         }
 
@@ -54,7 +54,14 @@ final class DefaultFrameTest {
         }
 
         @Test
-        void newInstance_withTooManyTotalPins_thenThrowIllegalArgumentException() {
+        void newInstance_withTooManyTotalPins1_thenThrowIllegalArgumentException() {
+            assertThrows(IllegalArgumentException.class, () ->
+                    new DefaultFrame(Frame.MAX_PINS, 1)  //STRIKE always means no second roll
+            );
+        }
+
+        @Test
+        void newInstance_withTooManyTotalPins2_thenThrowIllegalArgumentException() {
             assertThrows(IllegalArgumentException.class, () ->
                     new DefaultFrame(5, 6)
             );

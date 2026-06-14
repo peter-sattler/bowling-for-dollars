@@ -55,7 +55,7 @@ public final class ScoreCalculator {
             console.printf("Ten Pin Bowling game complete%n");
         }
         catch (RuntimeException runtimeException) {
-            runtimeException.printStackTrace(System.err);
+            console.printf("INPUT ERROR: %s!!!%n", runtimeException.getMessage());
         }
     }
 

@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Pete Sattler
  * @since July 2025
- * @version October 2025
+ * @version June 2026
  */
 @DisplayName("Final Frame Unit Tests")
 final class FinalFrameTest {
@@ -64,6 +64,13 @@ final class FinalFrameTest {
         void newInstance_withTooManyBonusPins_thenThrowIllegalArgumentException() {
             assertThrows(IllegalArgumentException.class, () ->
                     new FinalFrame(1, 2, Frame.MAX_PINS + 1)
+            );
+        }
+
+        @Test
+        void newInstance_withFirstStrikeWithTooManyBonusPins_thenThrowIllegalArgumentException() {
+            assertThrows(IllegalArgumentException.class, () ->
+                    new FinalFrame(Frame.MAX_PINS, 8, Frame.MAX_PINS)
             );
         }
 

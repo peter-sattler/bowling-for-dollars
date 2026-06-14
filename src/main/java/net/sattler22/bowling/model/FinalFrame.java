@@ -36,7 +36,7 @@ public final class FinalFrame extends Frame {
     public FinalFrame(int nbrPins1, int nbrPins2, int bonusNbrPins) {
         if (bonusNbrPins < 0)
             throw new IllegalArgumentException("Invalid number of bonus pins");
-        if (bonusNbrPins > MAX_PINS)
+        if (bonusNbrPins > MAX_PINS || (nbrPins1 == MAX_PINS && nbrPins2 != MAX_PINS && nbrPins2 + bonusNbrPins > MAX_PINS))
             throw new IllegalArgumentException("Maximum number of bonus pins exceeded");
         if (bonusNbrPins > 0 && !hasEarnedBonusRoll(nbrPins1, nbrPins2))
             throw new IllegalArgumentException("Bonus roll has not been earned");
@@ -52,6 +52,9 @@ public final class FinalFrame extends Frame {
      */
     FinalFrame(FinalFrame source) {
         this(source.firstRoll, source.secondRoll, source.bonusRoll);
+        synchronized (lock) {
+            this.score = source.score;
+        }
     }
 
     /**
@@ -62,7 +65,7 @@ public final class FinalFrame extends Frame {
      * @return True if all pins have been knocked down on the first two rolls. Otherwise, returns false.
      */
     public static boolean hasEarnedBonusRoll(int nbrPins1, int nbrPins2) {
-        return (nbrPins1 + nbrPins2) == Frame.MAX_PINS || nbrPins1 == Frame.MAX_PINS;
+        return nbrPins1 == Frame.MAX_PINS || nbrPins1 + nbrPins2 == Frame.MAX_PINS;
     }
 
     /**

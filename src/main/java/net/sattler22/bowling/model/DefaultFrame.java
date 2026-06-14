@@ -41,6 +41,9 @@ public final class DefaultFrame extends Frame {
      */
     DefaultFrame(DefaultFrame source) {
         this(source.firstRoll, source.secondRoll);
+        synchronized (lock) {
+            this.score = source.score;
+        }
     }
 
     /**
