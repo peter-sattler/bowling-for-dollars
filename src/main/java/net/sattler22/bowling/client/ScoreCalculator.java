@@ -68,10 +68,10 @@ public final class ScoreCalculator {
     }
 
     private static FinalFrame captureFinalFrame(Console console) {
-        final int nbrPins1 = captureRoll(console, "FIRST", Frame.MAX_PINS);
-        final int nbrPins2 = captureRoll(console, "SECOND", Frame.MAX_PINS);
+        final int nbrPins1 = captureRoll(console, "FIRST", Game.MAX_FRAMES);
+        final int nbrPins2 = captureRoll(console, "SECOND", Game.MAX_FRAMES);
         if (FinalFrame.hasEarnedBonusRoll(nbrPins1, nbrPins2)) {
-            final int bonusNbrPins = captureRoll(console, "BONUS", Frame.MAX_PINS);
+            final int bonusNbrPins = captureRoll(console, "BONUS", Game.MAX_FRAMES);
             return new FinalFrame(nbrPins1, nbrPins2, bonusNbrPins);
         }
         return new FinalFrame(nbrPins1, nbrPins2);

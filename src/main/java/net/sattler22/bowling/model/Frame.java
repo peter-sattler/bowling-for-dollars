@@ -38,7 +38,8 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
     protected Frame(int nbrPins1, int nbrPins2) {
         if (nbrPins1 < 0 || nbrPins2 < 0)
             throw new IllegalArgumentException("Invalid number of pins");
-        if (nbrPins1 > MAX_PINS || nbrPins2 > MAX_PINS)
+        if (nbrPins1 > MAX_PINS || nbrPins2 > MAX_PINS ||
+                (nbrPins1 != MAX_PINS && nbrPins2 != MAX_PINS && nbrPins1 + nbrPins2 > MAX_PINS))
             throw new IllegalArgumentException("Maximum number of pins exceeded");
         this.firstRoll = nbrPins1;
         this.secondRoll = nbrPins2;

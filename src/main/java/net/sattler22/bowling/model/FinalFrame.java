@@ -52,7 +52,7 @@ public final class FinalFrame extends Frame {
      */
     FinalFrame(FinalFrame source) {
         this(source.firstRoll, source.secondRoll, source.bonusRoll);
-        synchronized (lock) {
+        synchronized (source.lock) {
             this.score = source.score;
         }
     }

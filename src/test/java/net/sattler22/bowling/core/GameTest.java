@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Ten Pin Bowling Game Unit Tests
  *
  * @author Pete Sattler
- * @version October 2025
+ * @since October 2025
+ * @version June 2026
  */
 @DisplayName("Ten Pin Bowling Game Unit Tests")
 final class GameTest {
@@ -303,13 +304,46 @@ final class GameTest {
             game.updateScore();
             assertEquals(1, game.score());
         }
+
+        @Test
+        void score_withAllNines_thenReturnCorrectScore() {
+            final int nbrPins1 = 9;
+            final int nbrPins2 = 0;
+            final Game game = createDefaultFrames("All Nines", nbrPins1, nbrPins2);
+            game.addFrame(new FinalFrame(nbrPins1, nbrPins2, 0));
+            game.updateScore();
+            assertEquals(90, game.score());
+        }
+
+        @Test
+        void score_withAllSpares_thenReturnCorrectScore() {
+            final int nbrPins = 5;
+            final Game game = createDefaultFrames("All Spares", nbrPins, nbrPins);
+            game.addFrame(new FinalFrame(nbrPins, nbrPins, nbrPins));
+            game.updateScore();
+            assertEquals(150, game.score());
+        }
+
+        @Test
+        void score_withAllStrikes_thenReturnCorrectScore() {
+            final Game game = createDefaultFrames("All Strikes", Frame.MAX_PINS, 0);
+            game.addFrame(new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS));
+            game.updateScore();
+            assertEquals(300, game.score());
+        }
     }
 
     private static Game zeroGame(String playerName) {
+        final Game game = createDefaultFrames(playerName, 0, 0);
+        game.addFrame(new FinalFrame(0, 0));
+        game.updateScore();
+        return game;
+    }
+
+    private static Game createDefaultFrames(String playerName, int nbrPins1, int nbrPins2) {
         final Game game = new Game(playerName);
         for (int i = 0; i < Game.MAX_FRAMES - 1; i++)
-            game.addFrame(new DefaultFrame(0, 0));
-        game.addFrame(new FinalFrame(0, 0));
+            game.addFrame(new DefaultFrame(nbrPins1, nbrPins2));
         return game;
     }
 

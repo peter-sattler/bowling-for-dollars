@@ -54,6 +54,13 @@ final class FinalFrameTest {
         }
 
         @Test
+        void newInstance_withTooManyTotalPins_thenThrowIllegalArgumentException() {
+            assertThrows(IllegalArgumentException.class, () ->
+                    new FinalFrame(5, 6)
+            );
+        }
+
+        @Test
         void newInstance_withTooFewBonusPins_thenThrowIllegalArgumentException() {
             assertThrows(IllegalArgumentException.class, () ->
                     new FinalFrame(1, 2, -1)
@@ -94,7 +101,15 @@ final class FinalFrameTest {
         }
 
         @Test
-        void newInstance_withFirstStrike_thenSuccessful() {
+        void newInstance_withFirstStrikeOnly_thenSuccessful() {
+            final FinalFrame finalFrame = new FinalFrame(Frame.MAX_PINS, 0);  //Zero BONUS is implied
+            assertEquals(Frame.MAX_PINS, finalFrame.firstRoll());
+            assertEquals(0, finalFrame.secondRoll());
+            assertEquals(0, finalFrame.bonusRoll());
+        }
+
+        @Test
+        void newInstance_withFirstStrikeWithBonus_thenSuccessful() {
             assertNewInstanceHappyPath(Frame.MAX_PINS, 0, 4);
         }
 
@@ -184,7 +199,7 @@ final class FinalFrameTest {
         }
 
         @Test
-        void isOpen_withSecondStrike_thenReturnFalse() {
+        void isOpen_withSecondSpare_thenReturnFalse() {
             assertFalse(new FinalFrame(0, Frame.MAX_PINS, 2).isOpen());
         }
 
@@ -223,7 +238,7 @@ final class FinalFrameTest {
         }
 
         @Test
-        void isSpare_withSecondStrike_thenReturnTrue() {
+        void isSpare_withSecondSpare_thenReturnTrue() {
             assertTrue(new FinalFrame(0, Frame.MAX_PINS, 3).isSpare());
         }
 
@@ -262,7 +277,7 @@ final class FinalFrameTest {
         }
 
         @Test
-        void isStrike_withSecondStrike_thenReturnFalse() {
+        void isStrike_withSecondSpare_thenReturnFalse() {
             assertFalse(new FinalFrame(0, Frame.MAX_PINS, 4).isStrike());
         }
 
@@ -301,7 +316,7 @@ final class FinalFrameTest {
         }
 
         @Test
-        void isTurkey_withSecondStrike_thenReturnFalse() {
+        void isTurkey_withSecondSpare_thenReturnFalse() {
             assertFalse(new FinalFrame(0, Frame.MAX_PINS, 9).isTurkey());
         }
 
