@@ -2,6 +2,7 @@ package net.sattler22.bowling.model;
 
 import net.jcip.annotations.ThreadSafe;
 
+import java.util.Objects;
 import java.util.OptionalInt;
 
 /**
@@ -145,15 +146,17 @@ public abstract sealed class Frame permits DefaultFrame, FinalFrame {
 
     @Override
     public int hashCode() {
-        return Integer.hashCode(firstRoll) + Integer.hashCode(secondRoll);
+        return Objects.hash(getClass(), firstRoll, secondRoll);
     }
 
     @Override
     public boolean equals(Object other) {
         if (this == other)
             return true;
-        if (!(other instanceof Frame that))
-            return false;
+        //CAREFUL: Any Frame accepted, but FinalFrame equality requires a FinalFrame!!!
+        if (other == null || getClass() != other.getClass())
+            return false;  //Maintains symmetry
+        final Frame that = (Frame) other;
         return this.firstRoll == that.firstRoll && this.secondRoll == that.secondRoll;
     }
 

@@ -407,20 +407,21 @@ final class FinalFrameTest {
     }
 
     @Nested
-    @DisplayName("Equality Check")
+    @DisplayName("Equality and Symmetry")
     final class EqualsTest {
         @Test
-        void equals_whenSame_thenReturnTrue() {
-            final FinalFrame spareFrame1 = spareFrame(1, 5);
-            final FinalFrame spareFrame2 = spareFrame(1, 5);
-            assertEquals(spareFrame1, spareFrame2);
+        void equals_whenSameValue_thenReturnTrue() {
+            assertEquals(spareFrame(1, 5), spareFrame(1, 5));
         }
 
         @Test
-        void equals_whenDifferent_thenReturnFalse() {
-            final FinalFrame openFrame1 = new FinalFrame(1, 1);
-            final FinalFrame openFrame2 = new FinalFrame(1, 2);
-            assertNotEquals(openFrame1, openFrame2);
+        void equals_whenDifferentValues_thenReturnFalse() {
+            assertNotEquals(new FinalFrame(1, 1), new FinalFrame(1, 2));
+        }
+
+        @Test
+        void equals_whenDifferentTypes_thenReturnFalse() {
+            assertNotEquals(DefaultFrame.strike(), new FinalFrame(Frame.MAX_PINS, 0));  //Check symmetry
         }
     }
 

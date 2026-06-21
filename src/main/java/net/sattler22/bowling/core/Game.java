@@ -99,6 +99,8 @@ public final class Game {
             throw new IllegalStateException("%s's game is over".formatted(playerName));
         if (frame == null)
             throw new IllegalArgumentException("Frame is required");
+        if (frames.size() < MAX_FRAMES - 1 && frame instanceof FinalFrame)
+            throw new IllegalArgumentException("Default frame is required");
         if (frames.size() == MAX_FRAMES - 1 && !(frame instanceof FinalFrame))
             throw new IllegalArgumentException("Final frame is required");
         frames.add(Frame.copyOf(frame));  //Defensive copy

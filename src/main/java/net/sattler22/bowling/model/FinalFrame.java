@@ -34,15 +34,19 @@ public final class FinalFrame extends Frame {
      * @param bonusNbrPins The number of pins knocked down in the bonus (third) roll
      */
     public FinalFrame(int nbrPins1, int nbrPins2, int bonusNbrPins) {
+        validate(nbrPins1, nbrPins2, bonusNbrPins);
+        super(nbrPins1, nbrPins2);
+        this.bonusRoll = bonusNbrPins;
+        this.turkey = nbrPins1 == MAX_PINS && nbrPins2 == MAX_PINS && bonusNbrPins == MAX_PINS;
+    }
+
+    private static void validate(int nbrPins1, int nbrPins2, int bonusNbrPins) {
         if (bonusNbrPins < 0)
             throw new IllegalArgumentException("Invalid number of bonus pins");
         if (bonusNbrPins > MAX_PINS || (nbrPins1 == MAX_PINS && nbrPins2 != MAX_PINS && nbrPins2 + bonusNbrPins > MAX_PINS))
             throw new IllegalArgumentException("Maximum number of bonus pins exceeded");
         if (bonusNbrPins > 0 && !hasEarnedBonusRoll(nbrPins1, nbrPins2))
             throw new IllegalArgumentException("Bonus roll has not been earned");
-        super(nbrPins1, nbrPins2);
-        this.bonusRoll = bonusNbrPins;
-        this.turkey = nbrPins1 == MAX_PINS && nbrPins2 == MAX_PINS && bonusNbrPins == MAX_PINS;
     }
 
     /**

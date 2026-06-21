@@ -114,6 +114,15 @@ final class GameTest {
         }
 
         @Test
+        void addFrame_withFirstFinalFrame_thenThrowIllegalArgumentException() {
+            final Game game = new Game("Final Countdown");
+            final FinalFrame finalFrame = new FinalFrame(Frame.MAX_PINS, Frame.MAX_PINS, Frame.MAX_PINS);
+            assertThrows(IllegalArgumentException.class, () ->
+                    game.addFrame(finalFrame)
+            );
+        }
+
+        @Test
         void addFrame_withBadFinalFrame_thenThrowIllegalArgumentException() {
             final Game game = new Game("Justin Sane");
             for (int i = 0; i < Game.MAX_FRAMES - 1; i++)
