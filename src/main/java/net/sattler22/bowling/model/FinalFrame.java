@@ -43,10 +43,13 @@ public final class FinalFrame extends Frame {
     private static void validate(int nbrPins1, int nbrPins2, int bonusNbrPins) {
         if (bonusNbrPins < 0)
             throw new IllegalArgumentException("Invalid number of bonus pins");
-        if (bonusNbrPins > MAX_PINS || (nbrPins1 == MAX_PINS && nbrPins2 != MAX_PINS && nbrPins2 + bonusNbrPins > MAX_PINS))
+        if (bonusNbrPins > MAX_PINS)
             throw new IllegalArgumentException("Maximum number of bonus pins exceeded");
         if (bonusNbrPins > 0 && !hasEarnedBonusRoll(nbrPins1, nbrPins2))
             throw new IllegalArgumentException("Bonus roll has not been earned");
+        //After first roll STRIKE, the second and bonus rolls share a fresh rack unless second roll is also a STRIKE:
+        if (nbrPins1 == MAX_PINS && nbrPins2 < MAX_PINS && nbrPins2 + bonusNbrPins > MAX_PINS)
+            throw new IllegalArgumentException("Maximum number of bonus pins exceeded");
     }
 
     /**
@@ -89,9 +92,9 @@ public final class FinalFrame extends Frame {
     public void updateScore(int start) {
         if (start < 0)
             throw new IllegalArgumentException("Starting points cannot be negative");
-        if (hasScore())
-            throw new IllegalStateException("Score has already been updated");
         synchronized (lock) {
+            if (hasScore())
+                throw new IllegalStateException("Score has already been updated");
             this.score = start + total();
         }
     }
