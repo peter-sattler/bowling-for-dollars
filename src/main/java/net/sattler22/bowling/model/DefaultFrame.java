@@ -21,7 +21,7 @@ public final class DefaultFrame extends Frame {
      */
     public DefaultFrame(int nbrPins1, int nbrPins2) {
         if (nbrPins1 == MAX_PINS && nbrPins2 != 0)
-            throw new IllegalArgumentException("Maximum number of pins exceeded");
+            throw new IllegalArgumentException("Strike frame cannot have a second roll");
         super(nbrPins1, nbrPins2);
     }
 
