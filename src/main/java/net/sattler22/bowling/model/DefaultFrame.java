@@ -20,7 +20,7 @@ public final class DefaultFrame extends Frame {
      * @param nbrPins2 The number of pins knocked down in the second roll
      */
     public DefaultFrame(int nbrPins1, int nbrPins2) {
-        if (nbrPins1 + nbrPins2 > MAX_PINS)
+        if (nbrPins1 == MAX_PINS && nbrPins2 != 0)
             throw new IllegalArgumentException("Maximum number of pins exceeded");
         super(nbrPins1, nbrPins2);
     }
